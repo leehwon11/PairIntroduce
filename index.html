@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>내 페어 소개</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f6; --card:#fff; --line:#dfe4ec; --line-2:#eceff5;
+  --ink:#1b2130; --ink-2:#4e586b; --ink-3:#8b94a5;
+  --blue:#2f5fa8; --blue-soft:#eaf0fa; --red:#c0392b;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.wrap{max-width:460px;margin:0 auto;padding-bottom:84px}
+
+/* 헤더 */
+.top{padding:36px 22px 16px;position:relative}
+.top .eb{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--blue)}
+.top h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:25px;line-height:1.45;margin:12px 0 8px;white-space:pre-line}
+.top p{font-size:12.5px;line-height:1.85;color:var(--ink-2);margin:0}
+.edit-btn{
+  position:absolute;top:34px;right:20px;background:var(--card);border:1px solid var(--line);
+  border-radius:20px;padding:6px 13px;font-family:inherit;font-size:11px;color:var(--ink-3);cursor:pointer;
+}
+.edit-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+
+.tabs{display:flex;gap:6px;padding:0 22px 16px}
+.tabs button{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;cursor:pointer;
+  font-family:inherit;font-size:11px;color:var(--ink-3);padding:7px 14px;
+}
+.tabs button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500}
+
+/* 덱 */
+.deck{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 22px 18px;scrollbar-width:none}
+.deck::-webkit-scrollbar{display:none}
+.poster{
+  flex:0 0 calc(100% - 44px);scroll-snap-align:center;border-radius:20px;overflow:hidden;
+  position:relative;cursor:pointer;background:linear-gradient(145deg,var(--c1) 0%,var(--line) 50%,var(--c2) 100%);
+  padding:2px;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 10px rgba(27,33,48,.06);
+}
+.poster:active{transform:scale(.985)}
+.poster.on{box-shadow:0 6px 20px rgba(27,33,48,.14)}
+.poster-in{background:var(--card);border-radius:18px;overflow:hidden}
+.pv{width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--c1),var(--c2))}
+.pv img{width:100%;height:100%;object-fit:cover;display:block}
+.pv .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.7)}
+.pv::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(14,18,28,.88) 4%,rgba(14,18,28,.25) 42%,transparent 62%)}
+.pv .badge{position:absolute;top:12px;left:12px;z-index:2;font-size:10px;font-weight:500;color:#fff;
+  background:rgba(0,0,0,.42);backdrop-filter:blur(5px);padding:5px 11px;border-radius:20px}
+.pv .cross{position:absolute;top:12px;right:12px;z-index:2;font-size:9.5px;font-weight:600;
+  background:#f0c75e;color:#2b2110;padding:5px 9px;border-radius:20px}
+.vs{position:absolute;left:0;right:0;bottom:16px;z-index:2;padding:0 18px;color:#fff}
+.vs .nm{font-family:'Noto Serif KR',serif;font-weight:900;font-size:21px;line-height:1.25;
+  letter-spacing:-.02em;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.vs .nm i{font-style:normal}
+.vs .x{display:inline-block;font-weight:400;font-size:15px;color:rgba(255,255,255,.6);margin:0 7px;vertical-align:2px}
+.vs .al{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:rgba(255,255,255,.78);margin-top:7px}
+.pbody{padding:18px}
+.ptitle{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--blue);margin-bottom:10px}
+.hook{font-family:'Noto Serif KR',serif;font-weight:600;font-size:17px;line-height:1.6;margin:0 0 14px}
+.ptags{display:flex;flex-wrap:wrap;gap:5px}
+.ptags span{font-size:10.5px;color:var(--blue);background:var(--blue-soft);padding:4px 10px;border-radius:20px}
+.ptap{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-2);
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--ink-3);
+  display:flex;justify-content:space-between}
+.dots{display:flex;gap:6px;justify-content:center;padding:2px 0 26px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block;transition:.2s}
+.dots i.on{background:var(--blue);width:18px;border-radius:4px}
+
+/* 상세 */
+.detail{padding:0 22px}
+.d-head{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.d-head .bar{width:3px;height:32px;border-radius:3px;background:linear-gradient(var(--c1),var(--c2))}
+.d-head h2{font-family:'Noto Serif KR',serif;font-weight:700;font-size:20px;margin:0}
+.d-head .en{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-3);margin-top:3px}
+.sec{margin-bottom:24px}
+.sec-t{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--ink-3);margin-bottom:11px}
+.para{font-size:13px;line-height:1.95;color:var(--ink-2);margin:0}
+.who{display:flex;gap:12px;background:var(--card);border-radius:14px;padding:14px;margin-bottom:9px;
+  border:1px solid var(--line);border-left:3px solid var(--c,#ccc)}
+.who .av{flex:0 0 auto;width:48px;height:48px;border-radius:12px;overflow:hidden;background:var(--blue-soft);border:1px solid var(--line)}
+.who .av img{width:100%;height:100%;object-fit:cover;display:block}
+.who .d{flex:1;min-width:0}
+.who .n{font-family:'Noto Serif KR',serif;font-weight:600;font-size:14.5px}
+.who .g{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-3);margin-left:6px}
+.who .a{font-size:10.5px;color:var(--c,#888);margin-top:3px}
+.who .nt{font-size:11.5px;line-height:1.7;color:var(--ink-2);margin-top:6px}
+.who .hx{display:inline-flex;align-items:center;gap:5px;margin-top:6px;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-3)}
+.who .hx i{width:18px;height:7px;border-radius:2px;display:block;border:1px solid rgba(0,0,0,.1)}
+.my{font-size:8px;font-weight:700;background:var(--blue);color:#fff;padding:2px 6px;border-radius:4px;margin-left:5px;vertical-align:1px}
+.pov div{font-size:11.5px;line-height:1.8;color:var(--ink-2);padding-left:12px;border-left:2px solid var(--blue);margin-bottom:9px}
+.pov b{color:var(--ink);font-weight:600}
+.talk .b{font-size:13.5px;line-height:1.7;padding:12px 15px;border-radius:14px;margin-bottom:8px;
+  max-width:88%;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.talk .b .w{display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-3);margin-bottom:4px}
+.talk .b.b2{margin-left:auto;background:var(--blue);border-color:var(--blue);color:#fff;
+  border-bottom-left-radius:14px;border-bottom-right-radius:4px}
+.talk .b.b2 .w{color:rgba(255,255,255,.72)}
+.bgm{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-2);background:var(--card);
+  border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-top:12px}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-3);padding-top:14px;border-top:1px solid var(--line)}
+.meta .bar{flex:1;max-width:120px;height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.meta .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--c1),var(--c2))}
+
+/* ───── 편집 UI ───── */
+.form{padding:0 22px}
+.fg{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.fg h3{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:var(--blue);
+  margin:0 0 14px;display:flex;justify-content:space-between;align-items:center}
+.f{margin-bottom:12px}
+.f:last-child{margin-bottom:0}
+.f label{display:block;font-size:10.5px;color:var(--ink-3);margin-bottom:5px}
+.f input[type=text],.f input[type=date],.f input[type=number],.f textarea,.f select{
+  width:100%;background:#fafbfd;border:1px solid var(--line);border-radius:9px;
+  padding:9px 11px;font-family:inherit;font-size:13px;color:var(--ink);
+}
+.f textarea{resize:vertical;min-height:64px;line-height:1.7}
+.f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--blue);background:#fff}
+.f2{display:flex;gap:9px}
+.f2>.f{flex:1}
+.fchk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);cursor:pointer}
+.fchk input{width:16px;height:16px;accent-color:var(--blue)}
+.fcol{display:flex;align-items:center;gap:8px}
+.fcol input[type=color]{width:42px;height:34px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.imgbox{display:flex;align-items:center;gap:10px}
+.imgbox .pre{width:56px;height:56px;border-radius:10px;overflow:hidden;background:var(--blue-soft);
+  border:1px solid var(--line);flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:var(--ink-3)}
+.imgbox .pre img{width:100%;height:100%;object-fit:cover}
+.btn{background:var(--blue-soft);border:1px solid var(--line);border-radius:9px;color:var(--blue);
+  font-family:inherit;font-size:11.5px;padding:8px 13px;cursor:pointer}
+.btn:hover{background:#dfe9f8}
+.btn.g{background:#fff;color:var(--ink-3)}
+.btn.r{background:#fdeceb;color:var(--red);border-color:#f3cfcc}
+.addpair{width:100%;background:var(--card);border:1px dashed var(--line);border-radius:14px;
+  padding:14px;font-family:inherit;font-size:12.5px;color:var(--ink-3);cursor:pointer;margin-bottom:12px}
+.addpair:hover{border-color:var(--blue);color:var(--blue)}
+
+/* 저장 바 */
+.savebar{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;
+  border-top:1px solid var(--line);padding:11px 16px;
+  padding-bottom:calc(11px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:9px;max-width:460px;margin:0 auto;
+}
+.savebar[hidden]{display:none!important}
+.savebar .st{flex:1;font-size:11px;color:var(--ink-3);min-width:0}
+.savebar .st b{color:var(--blue)}
+.savebar button{border:none;border-radius:10px;font-family:inherit;font-size:12.5px;padding:10px 16px;cursor:pointer}
+.savebar .save{background:var(--blue);color:#fff;font-weight:500}
+.savebar .save:disabled{background:var(--line);color:var(--ink-3)}
+.savebar .cancel{background:#f1f3f7;color:var(--ink-2)}
+
+/* 토큰 모달 */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(20,26,38,.55);display:flex;
+  align-items:center;justify-content:center;padding:20px}
+.modal[hidden]{display:none!important}
+.modal .box{background:#fff;border-radius:18px;padding:22px;max-width:360px;width:100%}
+.modal h2{font-family:'Noto Serif KR',serif;font-size:18px;margin:0 0 6px}
+.modal .sub{font-size:11.5px;line-height:1.75;color:var(--ink-3);margin:0 0 16px}
+.modal .row{display:flex;gap:8px;margin-top:14px}
+.modal .row button{flex:1}
+.help{font-size:10.5px;line-height:1.8;color:var(--ink-3);background:#fafbfd;
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
+.help a{color:var(--blue)}
+
+/* 자르기 모달 */
+.cropper{position:fixed;inset:0;z-index:80;background:rgba(14,18,28,.92);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
+.cropper[hidden]{display:none!important}
+.cropper h2{color:#fff;font-family:'Noto Serif KR',serif;font-size:16px;margin:0 0 4px}
+.cropper .tip{color:rgba(255,255,255,.6);font-size:11px;margin:0 0 14px;text-align:center;line-height:1.7}
+.cstage{
+  position:relative;width:100%;max-width:330px;overflow:hidden;border-radius:14px;
+  background:#0b0e16;touch-action:none;cursor:grab;user-select:none;
+}
+.cstage.round{border-radius:50%}
+.cstage:active{cursor:grabbing}
+.cstage img{position:absolute;left:50%;top:50%;transform-origin:0 0;pointer-events:none;
+  -webkit-user-drag:none;max-width:none}
+.cstage .grid{position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.22) 33.2% 33.5%,transparent 33.5% 66.2%,rgba(255,255,255,.22) 66.2% 66.5%,transparent 66.5%),
+    linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.22) 33.2% 33.5%,transparent 33.5% 66.2%,rgba(255,255,255,.22) 66.2% 66.5%,transparent 66.5%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+.cstage.round .grid{border-radius:50%}
+.czoom{display:flex;align-items:center;gap:10px;width:100%;max-width:330px;margin-top:16px}
+.czoom span{color:rgba(255,255,255,.55);font-size:14px}
+.czoom input{flex:1;accent-color:#5b8ad6}
+.crow{display:flex;gap:9px;width:100%;max-width:330px;margin-top:16px}
+.crow button{flex:1;border:none;border-radius:11px;font-family:inherit;font-size:13px;padding:12px;cursor:pointer}
+.crow .ok{background:#2f5fa8;color:#fff;font-weight:500}
+.crow .no{background:rgba(255,255,255,.14);color:#fff}
+
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:90;
+  background:#1b2130;color:#fff;font-size:12px;padding:10px 16px;border-radius:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="eb" id="s-eb"></div>
+    <h1 id="s-title"></h1>
+    <p id="s-desc"></p>
+    <button class="edit-btn" id="editBtn">편집</button>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-f="all" class="on">전체</button>
+    <button data-f="ocpair">자캐 페어</button>
+    <button data-f="dream">드림</button>
+  </div>
+
+  <div class="deck" id="deck"></div>
+  <div class="dots" id="dots"></div>
+  <div id="detail"></div>
+  <div id="form"></div>
+</div>
+
+<div class="savebar" id="savebar" hidden>
+  <span class="st" id="st">편집 중</span>
+  <button class="cancel" id="cancelBtn">취소</button>
+  <button class="save" id="saveBtn">저장</button>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="box">
+    <h2>편집 모드</h2>
+    <p class="sub">GitHub 토큰을 넣으면 이 브라우저에서 바로 수정하고 저장할 수 있어요. 토큰은 이 브라우저에만 저장됩니다.</p>
+    <div class="f"><label>GitHub 아이디</label><input type="text" id="m-owner" placeholder="leehwon11"></div>
+    <div class="f"><label>레포 이름</label><input type="text" id="m-repo" placeholder="pair"></div>
+    <div class="f"><label>브랜치</label><input type="text" id="m-branch" placeholder="main" value="main"></div>
+    <div class="f"><label>토큰 (github_pat_…)</label><input type="text" id="m-token" placeholder="github_pat_..."></div>
+    <div class="help">
+      토큰 만드는 법 — GitHub 프로필 → Settings → Developer settings →
+      Personal access tokens → <b>Fine-grained tokens</b> → Generate new token →
+      Repository access는 <b>이 레포만</b>, Permissions → <b>Contents: Read and write</b>
+    </div>
+    <div class="row">
+      <button class="btn g" id="m-cancel">취소</button>
+      <button class="btn" id="m-ok">시작</button>
+    </div>
+  </div>
+</div>
+
+<div class="cropper" id="cropper" hidden>
+  <h2 id="c-title">사진 자르기</h2>
+  <p class="tip">끌어서 위치를 맞추고, 아래 막대로 확대·축소하세요</p>
+  <div class="cstage" id="cstage">
+    <img id="cimg" alt="">
+    <div class="grid"></div>
+  </div>
+  <div class="czoom">
+    <span>－</span>
+    <input type="range" id="czoom" min="100" max="400" value="100">
+    <span>＋</span>
+  </div>
+  <div class="crow">
+    <button class="no" id="c-cancel">취소</button>
+    <button class="ok" id="c-ok">이대로 올리기</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════ 상태 ═══════════════ */
+const S = {
+  data:null, orig:null, sha:null,
+  gh:{owner:'',repo:'',branch:'main',token:''},
+  editing:false, dirty:false, filter:'all', current:null, busy:false
+};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ═══════════════ 유틸 ═══════════════ */
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const b64enc = str => { const b=new TextEncoder().encode(str); let s=''; b.forEach(c=>s+=String.fromCharCode(c)); return btoa(s); };
+const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,'')), c=>c.charCodeAt(0)));
+const dday = iso => {
+  if(!iso) return '';
+  const a=new Date(iso), t=new Date(); if(isNaN(a)) return '';
+  a.setHours(0,0,0,0); t.setHours(0,0,0,0);
+  const d=Math.round((t-a)/864e5)+1; return d>=1?'D+'+d:'D'+(d-1);
+};
+function toast(msg){
+  const t=$('#toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200);
+}
+const visible = () => S.data.pairs.filter(p => S.filter==='all' || p.type===S.filter);
+const cur = () => S.data.pairs.find(p=>p.id===S.current);
+
+/* ═══════════════ GitHub ═══════════════ */
+function loadGh(){
+  try{ const v=JSON.parse(localStorage.getItem('pair-gh')||'null'); if(v) S.gh={...S.gh,...v}; }catch(e){}
+  if(!S.gh.owner && location.hostname.endsWith('github.io')) S.gh.owner = location.hostname.split('.')[0];
+  if(!S.gh.repo){
+    const seg = location.pathname.split('/').filter(Boolean);
+    if(seg.length && location.hostname.endsWith('github.io')) S.gh.repo = seg[0];
+  }
+}
+const api = p => `https://api.github.com/repos/${S.gh.owner}/${S.gh.repo}${p}`;
+const hdr = () => ({Authorization:`Bearer ${S.gh.token}`, Accept:'application/vnd.github+json'});
+
+async function ghGetFile(path){
+  const r = await fetch(api(`/contents/${path}?ref=${S.gh.branch}`), {headers:hdr()});
+  if(r.status===404) return null;
+  if(!r.ok) throw new Error('불러오기 실패 ('+r.status+')');
+  return r.json();
+}
+async function ghPut(path, contentB64, sha, msg){
+  const body = {message:msg, content:contentB64, branch:S.gh.branch};
+  if(sha) body.sha = sha;
+  const r = await fetch(api(`/contents/${path}`), {method:'PUT', headers:{...hdr(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||'저장 실패 ('+r.status+')'); }
+  return r.json();
+}
+
+/* ═══════════════ 렌더 : 보기 ═══════════════ */
+/* 문구 읽기 — data.json 에 없으면 기본값 */
+const T = (k, def) => {
+  const v = S.data?.site?.[k];
+  return (v===undefined || v===null || v==='') ? def : v;
+};
+
+function renderSite(){
+  $('#s-eb').textContent = T('eyebrow','MY PAIRS');
+  $('#s-title').textContent = T('title','');
+  $('#s-desc').textContent = T('desc','');
+  document.title = T('pageTitle','내 페어 소개');
+  const tb = $$('#tabs button');
+  if(tb[0]) tb[0].textContent = T('tabAll','전체');
+  if(tb[1]) tb[1].textContent = T('tabOc','자캐 페어');
+  if(tb[2]) tb[2].textContent = T('tabDream','드림');
+}
+
+function renderDeck(){
+  const v = visible();
+  $('#deck').innerHTML = v.map(p=>{
+    const a=p.chars[0]||{}, b=p.chars[1]||{};
+    return `
+    <div class="poster ${p.id===S.current?'on':''}" data-id="${esc(p.id)}" style="--c1:${esc(a.color||'#ccc')};--c2:${esc(b.color||'#ccc')}">
+      <div class="poster-in">
+        <div class="pv">
+          ${p.thumb?`<img src="${esc(p.thumb)}" alt="${esc(p.name)}">`:`<span class="ph">NO IMAGE</span>`}
+          <span class="badge">${esc(p.genre)}</span>
+          ${p.cross?`<span class="cross">${esc(T('crossLabel','자관'))}</span>`:''}
+          <div class="vs">
+            <div class="nm"><i>${esc(a.name)}</i><span class="x">×</span><i>${esc(b.name)}</i></div>
+            <div class="al">${esc(a.alias)} &nbsp;/&nbsp; ${esc(b.alias)}</div>
+          </div>
+        </div>
+        <div class="pbody">
+          <div class="ptitle">${esc(p.name)} · ${esc(p.nameEn)}</div>
+          <p class="hook">${esc(p.hook)}</p>
+          <div class="ptags">${(p.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+          <div class="ptap"><span>${esc(p.type==='dream'?T('labelDream','DREAM'):T('labelOc','OC PAIR'))}</span><span>${S.editing?'눌러서 편집 ▾':esc(T('tapHint','눌러서 자세히 ▾'))}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || `<p style="color:var(--ink-3);font-size:12.5px;padding:10px 0">${esc(T('emptyText','여기엔 아직 페어가 없어요.'))}</p>`;
+  $('#dots').innerHTML = v.map(p=>`<i class="${p.id===S.current?'on':''}" data-d="${esc(p.id)}"></i>`).join('');
+}
+
+function renderDetail(){
+  if(S.editing){ $('#detail').innerHTML=''; return; }
+  const p = cur();
+  if(!p){ $('#detail').innerHTML=''; return; }
+  const a=p.chars[0]||{}, b=p.chars[1]||{};
+  $('#detail').innerHTML = `
+  <div class="detail" style="--c1:${esc(a.color||'#ccc')};--c2:${esc(b.color||'#ccc')}">
+    <div class="d-head">
+      <div class="bar"></div>
+      <div><h2>${esc(p.name)}</h2><div class="en">${esc(p.nameEn)} · ${esc(p.genre)}</div></div>
+    </div>
+    <div class="sec"><div class="sec-t">${esc(T('secRelation','이런 사이예요'))}</div><p class="para">${esc(p.relation)}</p></div>
+    <div class="sec"><div class="sec-t">${esc(T('secChars','누구인가요'))}</div>
+      ${p.chars.map(c=>`
+      <div class="who" style="--c:${esc(c.color||'#ccc')}">
+        <div class="av">${c.avatar?`<img src="${esc(c.avatar)}" alt="${esc(c.name)}">`:''}</div>
+        <div class="d">
+          <div><span class="n">${esc(c.name)}</span><span class="g">${esc(c.age)}</span>${c.mine?`<span class="my">${esc(T('mineLabel','MY OC'))}</span>`:''}</div>
+          <div class="a">${esc(c.alias)}</div>
+          <div class="nt">${esc(c.note)}</div>
+          <div class="hx"><i style="background:${esc(c.color||'#ccc')}"></i>${esc(c.color)}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="sec"><div class="sec-t">${esc(T('secPov','서로를 이렇게 봅니다'))}</div>
+      <div class="pov">${(p.pov||[]).map(v=>`<div><b>${esc(v.who)}</b><br>${esc(v.text)}</div>`).join('')}</div>
+    </div>
+    <div class="sec"><div class="sec-t">${esc(T('secTalk','주고받는 말'))}</div>
+      <div class="talk">${(p.dialogue||[]).map((d,i)=>`
+        <div class="b ${i===1?'b2':''}"><span class="w">${esc(d.who)}</span>${esc(d.text)}</div>`).join('')}</div>
+      <div class="bgm">♪ &nbsp;${esc(p.bgm?.title)} — ${esc(p.bgm?.artist)}</div>
+    </div>
+    <div class="meta">
+      <span>${esc((p.anniversary||'').replace(/-/g,'.'))} · ${dday(p.anniversary)}</span>
+      <div class="bar"><i style="width:${Number(p.affinity)||0}%"></i></div>
+      <span>${Number(p.affinity)||0}%</span>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════ 렌더 : 편집 폼 ═══════════════ */
+function tf(label, path, val, type='text'){
+  return `<div class="f"><label>${label}</label><input type="${type}" data-p="${path}" value="${esc(val)}"></div>`;
+}
+function ta(label, path, val){
+  return `<div class="f"><label>${label}</label><textarea data-p="${path}">${esc(val)}</textarea></div>`;
+}
+function imgf(label, path, val, hint){
+  return `<div class="f"><label>${label}</label>
+    <div class="imgbox">
+      <div class="pre">${val?`<img src="${esc(val)}">`:'없음'}</div>
+      <div style="flex:1;min-width:0">
+        <button class="btn" data-up="${path}">사진 올리기</button>
+        ${val?`<button class="btn g" data-clr="${path}" style="margin-left:5px">지우기</button>`:''}
+        <div style="font-size:9.5px;color:var(--ink-3);margin-top:6px;word-break:break-all">${val?esc(val):(hint||'5MB 이하 이미지')}</div>
+      </div>
+    </div></div>`;
+}
+
+function renderForm(){
+  if(!S.editing){ $('#form').innerHTML=''; return; }
+  const p = cur();
+  const i = S.data.pairs.findIndex(x=>x.id===S.current);
+
+  let html = `<div class="form">
+    <div class="fg">
+      <h3><span>사이트 소개글</span></h3>
+      ${tf('작은 제목','site.eyebrow',T('eyebrow',''))}
+      ${ta('큰 제목 (줄바꿈 가능)','site.title',T('title',''))}
+      ${ta('설명','site.desc',T('desc',''))}
+      ${tf('브라우저 탭 제목','site.pageTitle',T('pageTitle','내 페어 소개'))}
+    </div>
+
+    <div class="fg">
+      <h3><span>화면 문구 바꾸기</span></h3>
+      <div class="f2">
+        ${tf('필터 — 전체','site.tabAll',T('tabAll','전체'))}
+        ${tf('필터 — 자캐 페어','site.tabOc',T('tabOc','자캐 페어'))}
+      </div>
+      <div class="f2">
+        ${tf('필터 — 드림','site.tabDream',T('tabDream','드림'))}
+        ${tf('카드 안내 문구','site.tapHint',T('tapHint','눌러서 자세히 ▾'))}
+      </div>
+      <div class="f2">
+        ${tf('자관 표시','site.crossLabel',T('crossLabel','자관'))}
+        ${tf('내 캐릭터 표시','site.mineLabel',T('mineLabel','MY OC'))}
+      </div>
+      <div class="f2">
+        ${tf('분류 표시 — 자캐','site.labelOc',T('labelOc','OC PAIR'))}
+        ${tf('분류 표시 — 드림','site.labelDream',T('labelDream','DREAM'))}
+      </div>
+      <div class="f2">
+        ${tf('섹션 — 관계','site.secRelation',T('secRelation','이런 사이예요'))}
+        ${tf('섹션 — 캐릭터','site.secChars',T('secChars','누구인가요'))}
+      </div>
+      <div class="f2">
+        ${tf('섹션 — 서로의 시선','site.secPov',T('secPov','서로를 이렇게 봅니다'))}
+        ${tf('섹션 — 대사','site.secTalk',T('secTalk','주고받는 말'))}
+      </div>
+      ${tf('페어가 없을 때 문구','site.emptyText',T('emptyText','여기엔 아직 페어가 없어요.'))}
+    </div>`;
+
+  if(p){
+    const a=p.chars[0]||{}, b=p.chars[1]||{};
+    html += `
+    <div class="fg">
+      <h3><span>기본 정보</span><button class="btn r" data-del="${i}">이 페어 삭제</button></h3>
+      ${tf('페어명','pairs.'+i+'.name',p.name)}
+      ${tf('영문명','pairs.'+i+'.nameEn',p.nameEn)}
+      ${tf('장르 / 배경','pairs.'+i+'.genre',p.genre)}
+      ${ta('한 줄 소개 (제일 중요!)','pairs.'+i+'.hook',p.hook)}
+      <div class="f2">
+        <div class="f"><label>분류</label>
+          <select data-p="pairs.${i}.type">
+            <option value="ocpair"${p.type==='ocpair'?' selected':''}>자캐 페어</option>
+            <option value="dream"${p.type==='dream'?' selected':''}>드림</option>
+          </select></div>
+        ${tf('기념일','pairs.'+i+'.anniversary',p.anniversary,'date')}
+      </div>
+      <div class="f2">
+        ${tf('관계 지수 (%)','pairs.'+i+'.affinity',p.affinity,'number')}
+        <div class="f"><label>자관 여부</label>
+          <label class="fchk" style="padding-top:8px">
+            <input type="checkbox" data-p="pairs.${i}.cross"${p.cross?' checked':''}> 상대 OC 포함
+          </label></div>
+      </div>
+      ${tf('태그 (쉼표로 구분)','pairs.'+i+'.tags',(p.tags||[]).join(', '))}
+    </div>
+
+    <div class="fg">
+      <h3><span>대표 이미지</span></h3>
+      ${imgf('페어 이미지','pairs.'+i+'.thumb',p.thumb)}
+      ${tf('이미지 출처 표기','pairs.'+i+'.thumbCredit',p.thumbCredit)}
+    </div>`;
+
+    p.chars.forEach((c,j)=>{
+      html += `
+      <div class="fg">
+        <h3><span>캐릭터 ${j===0?'A (왼쪽)':'B (오른쪽)'}</span></h3>
+        ${imgf('두상 이미지','pairs.'+i+'.chars.'+j+'.avatar',c.avatar)}
+        <div class="f2">
+          ${tf('이름','pairs.'+i+'.chars.'+j+'.name',c.name)}
+          ${tf('나이','pairs.'+i+'.chars.'+j+'.age',c.age)}
+        </div>
+        ${tf('이명','pairs.'+i+'.chars.'+j+'.alias',c.alias)}
+        ${ta('설정 메모','pairs.'+i+'.chars.'+j+'.note',c.note)}
+        <div class="f"><label>대표색 (카드 색이 됩니다)</label>
+          <div class="fcol">
+            <input type="color" data-p="pairs.${i}.chars.${j}.color" value="${esc(c.color||'#cccccc')}">
+            <input type="text" data-p="pairs.${i}.chars.${j}.color" value="${esc(c.color)}" style="flex:1">
+          </div></div>
+        <label class="fchk"><input type="checkbox" data-p="pairs.${i}.chars.${j}.mine"${c.mine?' checked':''}> 내 캐릭터</label>
+      </div>`;
+    });
+
+    html += `
+    <div class="fg">
+      <h3><span>관계</span></h3>
+      ${ta('관계 설명','pairs.'+i+'.relation',p.relation)}
+      ${tf('A가 보는 B — 제목','pairs.'+i+'.pov.0.who',p.pov?.[0]?.who||'')}
+      ${ta('A가 보는 B — 내용','pairs.'+i+'.pov.0.text',p.pov?.[0]?.text||'')}
+      ${tf('B가 보는 A — 제목','pairs.'+i+'.pov.1.who',p.pov?.[1]?.who||'')}
+      ${ta('B가 보는 A — 내용','pairs.'+i+'.pov.1.text',p.pov?.[1]?.text||'')}
+    </div>
+
+    <div class="fg">
+      <h3><span>주고받는 말</span></h3>
+      ${tf('첫 번째 — 말하는 사람','pairs.'+i+'.dialogue.0.who',p.dialogue?.[0]?.who||'')}
+      ${ta('첫 번째 — 대사','pairs.'+i+'.dialogue.0.text',p.dialogue?.[0]?.text||'')}
+      ${tf('두 번째 — 말하는 사람','pairs.'+i+'.dialogue.1.who',p.dialogue?.[1]?.who||'')}
+      ${ta('두 번째 — 대사','pairs.'+i+'.dialogue.1.text',p.dialogue?.[1]?.text||'')}
+    </div>
+
+    <div class="fg">
+      <h3><span>BGM</span></h3>
+      <div class="f2">
+        ${tf('곡 제목','pairs.'+i+'.bgm.title',p.bgm?.title||'')}
+        ${tf('아티스트','pairs.'+i+'.bgm.artist',p.bgm?.artist||'')}
+      </div>
+    </div>`;
+  }
+
+  html += `<button class="addpair" id="addPair">＋ 새 페어 추가하기</button></div>`;
+  $('#form').innerHTML = html;
+}
+
+/* ═══════════════ 데이터 쓰기 ═══════════════ */
+function setPath(path, val){
+  const seg = path.split('.');
+  let o = S.data;
+  for(let k=0;k<seg.length-1;k++){
+    const key = seg[k], nx = seg[k+1];
+    if(o[key]==null) o[key] = /^\d+$/.test(nx) ? [] : {};
+    o = o[key];
+  }
+  o[seg[seg.length-1]] = val;
+  S.dirty = true;
+  updateStatus();
+}
+
+function updateStatus(){
+  $('#st').innerHTML = S.dirty ? '<b>저장하지 않은 변경</b>이 있어요' : '편집 중';
+  $('#saveBtn').disabled = S.busy;
+}
+
+function renderAll(){ renderSite(); renderDeck(); renderDetail(); renderForm(); }
+
+/* ═══════════════ 이벤트 ═══════════════ */
+document.addEventListener('input', e=>{
+  const el = e.target.closest('[data-p]');
+  if(!el) return;
+  const path = el.dataset.p;
+  let v;
+  if(el.type==='checkbox') v = el.checked;
+  else if(el.type==='number') v = Number(el.value);
+  else v = el.value;
+  if(path.endsWith('.tags')) v = String(v).split(',').map(s=>s.trim()).filter(Boolean);
+  setPath(path, v);
+
+  // 색상/이름 등은 카드 미리보기에 바로 반영
+  if(/\.(color|name|alias|hook|genre|type|cross|nameEn|tags)$/.test(path)){
+    renderDeck();
+    if(path.endsWith('.color')){
+      // 컬러 피커 ↔ 텍스트 동기화
+      $$(`[data-p="${CSS.escape(path)}"]`).forEach(o=>{ if(o!==el) o.value = el.value; });
+    }
+  }
+  if(path.startsWith('site.')){ renderSite(); renderDeck(); renderDetail(); }
+});
+
+document.addEventListener('change', e=>{
+  const sel = e.target.closest('select[data-p]');
+  if(sel){ setPath(sel.dataset.p, sel.value); renderDeck(); }
+});
+
+document.addEventListener('click', async e=>{
+  // 포스터 선택
+  const po = e.target.closest('.poster');
+  if(po){
+    S.current = po.dataset.id; renderDeck(); renderDetail(); renderForm();
+    (S.editing ? $('#form') : $('#detail')).scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  // 필터
+  const t = e.target.closest('#tabs button');
+  if(t){
+    S.filter = t.dataset.f;
+    $$('#tabs button').forEach(b=>b.classList.toggle('on', b===t));
+    const v = visible(); S.current = v.length ? v[0].id : null;
+    renderDeck(); renderDetail(); renderForm();
+    return;
+  }
+  // 편집 토글
+  if(e.target.id==='editBtn'){
+    if(S.editing){ exitEdit(); } else { openModal(); }
+    return;
+  }
+  // 모달
+  if(e.target.id==='m-cancel'){ $('#modal').hidden = true; return; }
+  if(e.target.id==='m-ok'){ await startEdit(); return; }
+  // 저장 / 취소
+  if(e.target.id==='saveBtn'){ await save(); return; }
+  if(e.target.id==='cancelBtn'){
+    if(S.dirty && !confirm('저장하지 않은 변경이 사라져요. 그래도 나갈까요?')) return;
+    S.data = JSON.parse(JSON.stringify(S.orig)); S.dirty=false; exitEdit(); return;
+  }
+  // 페어 추가
+  if(e.target.id==='addPair'){ addPair(); return; }
+  // 페어 삭제
+  const del = e.target.closest('[data-del]');
+  if(del){
+    const i = Number(del.dataset.del);
+    if(!confirm(`"${S.data.pairs[i].name}" 페어를 삭제할까요?`)) return;
+    S.data.pairs.splice(i,1); S.dirty=true;
+    const v = visible(); S.current = v.length ? v[0].id : null;
+    renderAll(); updateStatus(); return;
+  }
+  // 이미지 지우기
+  const clr = e.target.closest('[data-clr]');
+  if(clr){ setPath(clr.dataset.clr,''); renderAll(); return; }
+  // 이미지 올리기
+  const up = e.target.closest('[data-up]');
+  if(up){ pickImage(up.dataset.up); return; }
+});
+
+/* ═══════════════ 편집 진입/종료 ═══════════════ */
+function openModal(){
+  loadGh();
+  $('#m-owner').value = S.gh.owner;
+  $('#m-repo').value = S.gh.repo;
+  $('#m-branch').value = S.gh.branch||'main';
+  $('#m-token').value = S.gh.token;
+  $('#modal').hidden = false;
+}
+
+async function startEdit(){
+  S.gh = {
+    owner:$('#m-owner').value.trim(), repo:$('#m-repo').value.trim(),
+    branch:($('#m-branch').value.trim()||'main'), token:$('#m-token').value.trim()
+  };
+  if(!S.gh.owner||!S.gh.repo||!S.gh.token){ toast('아이디·레포·토큰을 모두 입력해주세요'); return; }
+  try{
+    const f = await ghGetFile('data.json');
+    if(!f) throw new Error('레포에 data.json 이 없어요');
+    S.sha = f.sha;
+    S.data = JSON.parse(b64dec(f.content));
+    S.orig = JSON.parse(JSON.stringify(S.data));
+    localStorage.setItem('pair-gh', JSON.stringify(S.gh));
+    $('#modal').hidden = true;
+    S.editing = true; S.dirty = false;
+    $('#editBtn').textContent = '보기'; $('#editBtn').classList.add('on');
+    $('#savebar').hidden = false;
+    const v = visible(); if(!cur()) S.current = v.length?v[0].id:null;
+    renderAll(); updateStatus();
+    toast('편집 모드예요');
+  }catch(err){ toast(err.message); }
+}
+
+function exitEdit(){
+  S.editing = false;
+  $('#editBtn').textContent = '편집'; $('#editBtn').classList.remove('on');
+  $('#savebar').hidden = true;
+  renderAll();
+}
+
+/* ═══════════════ 페어 추가 ═══════════════ */
+function addPair(){
+  const id = 'pair-' + Date.now().toString(36);
+  S.data.pairs.push({
+    id, name:'새 페어', nameEn:'NEW PAIR', type:'ocpair', cross:false,
+    genre:'장르', anniversary:new Date().toISOString().slice(0,10), affinity:80,
+    hook:'한 줄 소개를 적어주세요.', thumb:'', thumbCredit:'',
+    tags:['#태그'],
+    chars:[
+      {name:'캐릭터 A', age:'나이', alias:'이명', color:'#3C6FC4', note:'설정 메모', avatar:'', mine:false},
+      {name:'캐릭터 B', age:'나이', alias:'이명', color:'#C9603C', note:'설정 메모', avatar:'', mine:false}
+    ],
+    relation:'두 사람이 어떤 사이인지 적어주세요.',
+    pov:[{who:'A가 보는 B',text:''},{who:'B가 보는 A',text:''}],
+    bgm:{title:'',artist:''},
+    dialogue:[{who:'캐릭터 A',text:''},{who:'캐릭터 B',text:''}]
+  });
+  S.current = id; S.filter='all'; S.dirty=true;
+  $$('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.f==='all'));
+  renderAll(); updateStatus();
+  $('#form').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ═══════════════ 이미지 자르기 ═══════════════ */
+const C = {open:false, img:null, nw:0, nh:0, fw:0, fh:0, base:1, zoom:1, tx:0, ty:0, resolve:null, isPng:false};
+
+function clampPan(){
+  const s = C.base * C.zoom;
+  const maxX = Math.max(0, (C.nw*s - C.fw)/2);
+  const maxY = Math.max(0, (C.nh*s - C.fh)/2);
+  C.tx = Math.min(maxX, Math.max(-maxX, C.tx));
+  C.ty = Math.min(maxY, Math.max(-maxY, C.ty));
+}
+function drawCrop(){
+  const s = C.base * C.zoom;
+  clampPan();
+  const x = C.tx - C.nw*s/2, y = C.ty - C.nh*s/2;
+  $('#cimg').style.transform = `translate(${x}px,${y}px) scale(${s})`;
+  $('#cimg').style.width = C.nw+'px';
+  $('#cimg').style.height = C.nh+'px';
+}
+
+/* 파일을 받아 자른 Blob 을 돌려줍니다 */
+function cropImage(file, aspect, round){
+  return new Promise(resolve=>{
+    const url = URL.createObjectURL(file);
+    const img = $('#cimg');
+    C.isPng = /png/i.test(file.type);
+    img.onload = ()=>{
+      C.nw = img.naturalWidth; C.nh = img.naturalHeight;
+      const stage = $('#cstage');
+      stage.classList.toggle('round', !!round);
+      C.fw = stage.clientWidth || 330;
+      C.fh = Math.round(C.fw / aspect);
+      stage.style.height = C.fh+'px';
+      C.base = Math.max(C.fw/C.nw, C.fh/C.nh);
+      C.zoom = 1; C.tx = 0; C.ty = 0;
+      $('#czoom').value = 100;
+      drawCrop();
+    };
+    img.src = url;
+    $('#c-title').textContent = round ? '두상 자르기 (1:1)' : '페어 이미지 자르기 (4:3)';
+    $('#cropper').hidden = false;
+    C.open = true;
+    C.resolve = (blob)=>{
+      C.open = false; $('#cropper').hidden = true;
+      URL.revokeObjectURL(url);
+      resolve(blob);
+    };
+  });
+}
+
+function makeBlob(){
+  return new Promise(res=>{
+    const s = C.base * C.zoom;
+    // 화면에서 이미지 픽셀(0,0)이 놓이는 프레임 좌표.
+    // CSS 의 left/top:50% 가 프레임 중심(fw/2, fh/2)을 이미 더해주므로 여기서도 더해야 함
+    const cx = C.fw/2 + C.tx - C.nw*s/2;
+    const cy = C.fh/2 + C.ty - C.nh*s/2;
+    const sx = (-cx)/s, sy = (-cy)/s, sw = C.fw/s, sh = C.fh/s;
+    const outW = Math.min(1400, Math.round(sw));
+    const outH = Math.round(outW * (C.fh/C.fw));
+    const cv = document.createElement('canvas');
+    cv.width = outW; cv.height = outH;
+    const g = cv.getContext('2d');
+    g.imageSmoothingQuality = 'high';
+    g.drawImage($('#cimg'), sx, sy, sw, sh, 0, 0, outW, outH);
+    const jpeg = ()=>cv.toBlob(b=>res({blob:b, ext:'jpg'}), 'image/jpeg', .9);
+    if(C.isPng) cv.toBlob(b=>{ (b && b.size<=2*1024*1024) ? res({blob:b, ext:'png'}) : jpeg(); }, 'image/png');
+    else jpeg();
+  });
+}
+
+/* 끌기 / 확대 */
+(function bindCropper(){
+  const stage = $('#cstage');
+  const pts = new Map();
+  let last=null, pinch=null;
+  stage.addEventListener('pointerdown', e=>{
+    stage.setPointerCapture(e.pointerId);
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===1) last={x:e.clientX,y:e.clientY};
+    if(pts.size===2){
+      const [a,b]=[...pts.values()];
+      pinch={d:Math.hypot(a.x-b.x,a.y-b.y), z:C.zoom};
+    }
+  });
+  stage.addEventListener('pointermove', e=>{
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2 && pinch){
+      const [a,b]=[...pts.values()];
+      const d=Math.hypot(a.x-b.x,a.y-b.y);
+      C.zoom = Math.min(4, Math.max(1, pinch.z * (d/pinch.d)));
+      $('#czoom').value = Math.round(C.zoom*100);
+      drawCrop(); return;
+    }
+    if(last){
+      C.tx += e.clientX-last.x; C.ty += e.clientY-last.y;
+      last={x:e.clientX,y:e.clientY};
+      drawCrop();
+    }
+  });
+  const up = e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null; if(!pts.size) last=null; };
+  stage.addEventListener('pointerup', up);
+  stage.addEventListener('pointercancel', up);
+  stage.addEventListener('wheel', e=>{
+    e.preventDefault();
+    C.zoom = Math.min(4, Math.max(1, C.zoom * (e.deltaY<0?1.08:0.92)));
+    $('#czoom').value = Math.round(C.zoom*100);
+    drawCrop();
+  }, {passive:false});
+  $('#czoom').addEventListener('input', e=>{
+    C.zoom = Number(e.target.value)/100; drawCrop();
+  });
+  $('#c-cancel').addEventListener('click', ()=>{ if(C.resolve) C.resolve(null); });
+  $('#c-ok').addEventListener('click', async ()=>{
+    const out = await makeBlob();
+    if(C.resolve) C.resolve(out);
+  });
+})();
+
+/* ═══════════════ 이미지 업로드 ═══════════════ */
+function pickImage(path){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*';
+  inp.onchange = async () => {
+    const file = inp.files[0]; if(!file) return;
+    if(file.size > 15*1024*1024){ toast('너무 큰 이미지예요 (15MB 이하)'); return; }
+
+    const isAvatar = /\.avatar$/.test(path);
+    const out = await cropImage(file, isAvatar ? 1 : 4/3, isAvatar);
+    if(!out){ return; }                       // 취소
+    if(out.blob.size > 5*1024*1024){ toast('자른 이미지가 너무 커요'); return; }
+
+    S.busy = true; updateStatus(); toast('이미지 올리는 중…');
+    try{
+      const buf = new Uint8Array(await out.blob.arrayBuffer());
+      let bin=''; const CH=0x8000;
+      for(let i=0;i<buf.length;i+=CH) bin += String.fromCharCode.apply(null, buf.subarray(i,i+CH));
+      const name = `images/${Date.now().toString(36)}.${out.ext}`;
+      await ghPut(name, btoa(bin), null, 'upload image');
+      setPath(path, name);
+      renderAll();
+      toast('이미지를 올렸어요');
+    }catch(err){ toast(err.message); }
+    S.busy=false; updateStatus();
+  };
+  inp.click();
+}
+
+/* ═══════════════ 저장 ═══════════════ */
+async function save(){
+  if(S.busy) return;
+  S.busy = true; updateStatus(); toast('저장 중…');
+  try{
+    const json = JSON.stringify(S.data, null, 2);
+    const res = await ghPut('data.json', b64enc(json), S.sha, 'update pairs');
+    S.sha = res.content.sha;
+    S.orig = JSON.parse(JSON.stringify(S.data));
+    S.dirty = false;
+    toast('저장했어요! 1~2분 뒤 사이트에 반영돼요');
+  }catch(err){
+    if(String(err.message).includes('does not match')){
+      toast('다른 곳에서 먼저 수정됐어요. 새로고침 후 다시 해주세요');
+    } else toast(err.message);
+  }
+  S.busy = false; updateStatus();
+}
+
+window.addEventListener('beforeunload', e=>{
+  if(S.dirty){ e.preventDefault(); e.returnValue=''; }
+});
+
+/* ═══════════════ 시작 ═══════════════ */
+(async function init(){
+  loadGh();
+  try{
+    const r = await fetch('data.json?t='+Date.now());
+    S.data = await r.json();
+  }catch(e){
+    $('#form').innerHTML = `<div class="form"><div class="fg">
+      <h3>data.json 을 못 불러왔어요</h3>
+      <p style="font-size:12px;line-height:1.8;color:var(--ink-2);margin:0">
+      index.html 과 같은 위치에 data.json 이 있어야 해요.<br>
+      (내 컴퓨터에서 그냥 열면 보안 때문에 안 보일 수 있어요 — GitHub에 올린 뒤 확인해주세요)</p>
+    </div></div>`;
+    return;
+  }
+  S.current = S.data.pairs[0]?.id || null;
+  renderAll();
+})();
+
+/* 스와이프 → 도트 */
+$('#deck').addEventListener('scroll',()=>{
+  const d=$('#deck'), ps=[...d.querySelectorAll('.poster')];
+  const mid=d.scrollLeft+d.clientWidth/2;
+  let near=ps[0], best=1e9;
+  ps.forEach(p=>{ const c=p.offsetLeft+p.offsetWidth/2, g=Math.abs(c-mid); if(g<best){best=g;near=p;} });
+  if(near) $$('#dots i').forEach(i=>i.classList.toggle('on', i.dataset.d===near.dataset.id));
+},{passive:true});
+</script>
+</body>
+</html>
