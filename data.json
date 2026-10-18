@@ -2,7 +2,7 @@
   "site": {
     "eyebrow": "팀헤테로",
     "title": "남파's 헤테로 공방",
-    "desc": "드림+1차 자관&자컾\n옆으로 스크롤하면 됩니다",
+    "desc": "드림+1차 자관&자컾. 옆으로 스크롤하면 됩니다",
     "pageTitle": "남파's 헤테로 공방",
     "tabAll": "전체",
     "tabOc": "자캐 페어",
@@ -10,10 +10,10 @@
     "tapHint": "눌러서 자세히 ▾",
     "crossLabel": "자관",
     "mineLabel": "MY OC",
-    "secRelation": "이런 사이예요",
-    "secChars": "누구인가요",
-    "secPov": "서로를 이렇게 봅니다",
-    "secTalk": "주고받는 말",
+    "secRelation": "관계",
+    "secChars": "캐릭터",
+    "secPov": "감정",
+    "secTalk": "대사",
     "labelOc": "OC PAIR",
     "labelDream": "DREAM",
     "emptyText": "여기엔 아직 페어가 없어요."
@@ -26,15 +26,15 @@
       "type": "ocpair",
       "cross": false,
       "genre": "그리스로마신화",
-      "anniversary": "2026-08-24",
-      "affinity": 92,
-      "hook": "끝내러 온 사람과, 그 끝을 기다린 사람.",
-      "thumb": "",
-      "thumbCredit": "©뽁주",
+      "anniversary": "2026-08-23",
+      "affinity": 44,
+      "hook": "내가 너를 죽일테니, 죽지 마.",
+      "thumb": "images/mvdz7m8w.png",
+      "thumbCredit": "© 속도빼면시체",
       "tags": [
-        "#상처케어",
-        "#티키타카",
-        "#구원서사"
+        "#부부",
+        "#외사랑",
+        "#애증"
       ],
       "chars": [
         {
