@@ -103,17 +103,17 @@
         {
           "name": "토리모토 니시키",
           "age": "19세",
-          "alias": "항로의 마지막 별",
-          "color": "#C9922F",
+          "alias": "",
+          "color": "#486a61",
           "note": "음파",
           "avatar": "images/mvf37o6i.png",
-          "mine": false
+          "mine": true
         },
         {
           "name": "아사미 야에카",
           "age": "18세",
           "alias": "착한 아이",
-          "color": "#C46A32",
+          "color": "#ffb0bd",
           "note": "염동력.",
           "avatar": "images/mvf37rky.png",
           "mine": false
