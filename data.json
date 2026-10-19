@@ -84,20 +84,20 @@
     },
     {
       "id": "novatic",
-      "name": "노바틱",
-      "nameEn": "NOVATIC",
+      "name": "닛양",
+      "nameEn": "",
       "type": "ocpair",
-      "cross": false,
-      "genre": "SF · 우주선",
-      "anniversary": "2024-01-19",
-      "affinity": 88,
-      "hook": "길 잃은 둘이, 서로를 길로 삼은 이야기.",
+      "cross": true,
+      "genre": "현대 일본",
+      "anniversary": "2026-09-06",
+      "affinity": 76,
+      "hook": "유이무이한 초능력자들!",
       "thumb": "",
       "thumbCredit": "",
       "tags": [
-        "#생존동료",
-        "#신뢰",
-        "#고장난게더좋아"
+        "#동료",
+        "#그래도 나니까 봐줄게",
+        "#짜증나 네가 뭔데~!"
       ],
       "chars": [
         {
