@@ -92,7 +92,7 @@
       "anniversary": "2026-09-06",
       "affinity": 76,
       "hook": "유이무이한 초능력자들!",
-      "thumb": "",
+      "thumb": "images/mvf36he0.jpg",
       "thumbCredit": "",
       "tags": [
         "#동료",
@@ -101,21 +101,21 @@
       ],
       "chars": [
         {
-          "name": "유디트 칸",
-          "age": "31세",
+          "name": "토리모토 니시키",
+          "age": "19세",
           "alias": "항로의 마지막 별",
           "color": "#C9922F",
-          "note": "방향치인 걸 죽어도 인정 안 함.",
-          "avatar": "",
+          "note": "음파",
+          "avatar": "images/mvf37o6i.png",
           "mine": false
         },
         {
-          "name": "레이 아스텔",
-          "age": "29세",
-          "alias": "고장난 나침반",
+          "name": "아사미 야에카",
+          "age": "18세",
+          "alias": "착한 아이",
           "color": "#C46A32",
-          "note": "고치는 걸 못 참는 성격. 물건도, 사람도.",
-          "avatar": "",
+          "note": "염동력.",
+          "avatar": "images/mvf37rky.png",
           "mine": false
         }
       ],
