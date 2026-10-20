@@ -13,6 +13,8 @@
   --blue:#2f5fa8; --blue-soft:#eaf0fa; --red:#c0392b;
 }
 *{box-sizing:border-box}
+/* display:flex 등이 지정된 요소도 hidden 으로 숨겨지게 (안 그러면 무시됨) */
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg);color:var(--ink);
