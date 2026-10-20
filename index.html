@@ -177,6 +177,90 @@ body{
   border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
 .help a{color:var(--blue)}
 
+/* ───── 첫 화면 ───── */
+.cover{
+  position:fixed;inset:0;z-index:45;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:30px 26px;text-align:center;
+  padding-top:calc(30px + env(safe-area-inset-top,0px));
+  padding-bottom:calc(30px + env(safe-area-inset-bottom,0px));
+  transition:opacity .4s ease,visibility .4s ease;
+}
+.cover[hidden]{display:none!important}
+.cover.out{opacity:0;visibility:hidden;pointer-events:none}
+.cover .in{max-width:330px;width:100%}
+.cover .cnt{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:.14em;color:var(--blue);background:var(--blue-soft);
+  padding:6px 13px;border-radius:20px;margin-bottom:22px;
+}
+.cover h2{
+  font-family:'Noto Serif KR',serif;font-weight:700;font-size:30px;
+  line-height:1.4;margin:0 0 14px;white-space:pre-line;
+}
+.cover p{font-size:13px;line-height:1.95;color:var(--ink-2);margin:0 0 28px;white-space:pre-line}
+.cover .big{
+  width:100%;background:var(--blue);color:#fff;border:none;border-radius:14px;
+  font-family:inherit;font-size:14.5px;font-weight:500;padding:15px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(47,95,168,.3);
+}
+.cover .big:active{transform:scale(.99)}
+.cover .two{display:flex;gap:9px;margin-top:9px}
+.cover .two button{
+  flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  font-family:inherit;font-size:12.5px;color:var(--ink-2);padding:13px 6px;cursor:pointer;
+}
+.cover .two button:active{border-color:var(--blue);color:var(--blue)}
+.cover .foot{font-size:11px;color:var(--ink-3);margin-top:22px;line-height:1.8;white-space:pre-line}
+.cover .dec{
+  display:flex;gap:6px;justify-content:center;margin-bottom:26px;
+}
+.cover .dec i{width:34px;height:4px;border-radius:4px;display:block}
+
+/* ───── 보기 전환 ───── */
+.viewbar{display:flex;align-items:center;gap:6px;padding:0 22px 14px}
+.viewbar .sp{flex:1}
+.viewbar button{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;cursor:pointer;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;
+  color:var(--ink-3);padding:6px 12px;
+}
+.viewbar button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* ───── 목록 보기 ───── */
+.list{padding:0 22px}
+.lrow{
+  display:flex;gap:12px;align-items:center;width:100%;text-align:left;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:11px;margin-bottom:8px;position:relative;overflow:hidden;
+}
+.lrow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(var(--c1),var(--c2))}
+.lrow .th{
+  flex:0 0 auto;width:54px;height:54px;border-radius:10px;overflow:hidden;margin-left:4px;
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+}
+.lrow .th img{width:100%;height:100%;object-fit:cover;display:block}
+.lrow .tx{flex:1;min-width:0}
+.lrow .nm{font-family:'Noto Serif KR',serif;font-weight:600;font-size:14.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .hk{font-size:11.5px;color:var(--ink-2);margin-top:3px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lrow .mt{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-3);margin-top:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .ar{flex:0 0 auto;color:var(--ink-3);font-size:14px}
+.lrow.on{border-color:var(--blue);box-shadow:0 2px 10px rgba(47,95,168,.14)}
+
+/* ───── 순서 바꾸기 ───── */
+.ord{display:flex;align-items:center;gap:9px;background:#fafbfd;border:1px solid var(--line);
+  border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.ord .n{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ord .ix{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-3);width:18px;flex:0 0 auto}
+.ord button{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--line);background:#fff;
+  border-radius:8px;cursor:pointer;color:var(--ink-2);font-size:13px;line-height:1;padding:0}
+.ord button:disabled{opacity:.3;cursor:default}
+.ord button:not(:disabled):active{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+
 /* 자르기 모달 */
 .cropper{position:fixed;inset:0;z-index:80;background:rgba(14,18,28,.92);
   display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
@@ -212,6 +296,21 @@ body{
 </style>
 </head>
 <body>
+<div class="cover" id="cover" hidden>
+  <div class="in">
+    <div class="dec" id="c-dec"></div>
+    <span class="cnt" id="c-cnt"></span>
+    <h2 id="c-h"></h2>
+    <p id="c-p"></p>
+    <button class="big" data-enter="all" id="c-all"></button>
+    <div class="two">
+      <button data-enter="ocpair" id="c-oc"></button>
+      <button data-enter="dream" id="c-dr"></button>
+    </div>
+    <div class="foot" id="c-foot"></div>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="top">
     <div class="eb" id="s-eb"></div>
@@ -226,8 +325,15 @@ body{
     <button data-f="dream">드림</button>
   </div>
 
+  <div class="viewbar">
+    <span class="sp"></span>
+    <button data-v="deck" id="v-deck" class="on">카드</button>
+    <button data-v="list" id="v-list">목록</button>
+  </div>
+
   <div class="deck" id="deck"></div>
   <div class="dots" id="dots"></div>
+  <div class="list" id="list" hidden></div>
   <div id="detail"></div>
   <div id="form"></div>
 </div>
@@ -283,7 +389,8 @@ body{
 const S = {
   data:null, orig:null, sha:null,
   gh:{owner:'',repo:'',branch:'main',token:''},
-  editing:false, dirty:false, filter:'all', current:null, busy:false
+  editing:false, dirty:false, filter:'all', current:null, busy:false,
+  view: (localStorage.getItem('pair-view')==='list' ? 'list' : 'deck')
 };
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -347,6 +454,67 @@ function renderSite(){
   if(tb[0]) tb[0].textContent = T('tabAll','전체');
   if(tb[1]) tb[1].textContent = T('tabOc','자캐 페어');
   if(tb[2]) tb[2].textContent = T('tabDream','드림');
+  $('#v-deck').textContent = T('viewDeck','카드');
+  $('#v-list').textContent = T('viewList','목록');
+  renderCover();
+}
+
+/* ───── 첫 화면 ───── */
+function renderCover(){
+  const n = S.data.pairs.length;
+  $('#c-cnt').textContent = `페어 ${n}쌍`;
+  $('#c-h').textContent = T('coverTitle','어서 오세요');
+  $('#c-p').textContent = T('coverDesc','');
+  $('#c-all').textContent = T('coverAll','전체 보기');
+  $('#c-oc').textContent = T('coverOc','자캐 페어만');
+  $('#c-dr').textContent = T('coverDream','드림만');
+  const f = T('coverFoot','');
+  $('#c-foot').textContent = f; $('#c-foot').style.display = f ? '' : 'none';
+  // 페어들의 대표색을 띠로 보여줌
+  $('#c-dec').innerHTML = S.data.pairs.slice(0,5).map(p=>{
+    const a=p.chars?.[0]?.color||'#ccc', b=p.chars?.[1]?.color||'#ccc';
+    return `<i style="background:linear-gradient(90deg,${esc(a)},${esc(b)})"></i>`;
+  }).join('');
+}
+function showCover(){
+  if(S.editing || T('showCover',true)===false){ $('#cover').hidden = true; return; }
+  $('#cover').hidden = false;
+  $('#cover').classList.remove('out');
+}
+function hideCover(){
+  const c = $('#cover');
+  c.classList.add('out');
+  setTimeout(()=>{ c.hidden = true; }, 420);
+}
+
+/* ───── 보기 전환 ───── */
+function applyView(){
+  const list = S.view==='list';
+  $('#deck').hidden = list;
+  $('#dots').hidden = list;
+  $('#list').hidden = !list;
+  $('#v-deck').classList.toggle('on', !list);
+  $('#v-list').classList.toggle('on', list);
+  // 편집 중에는 카드로 고정 (어느 페어를 고치는지 보여야 함)
+  $('.viewbar').style.display = S.editing ? 'none' : '';
+}
+
+function renderList(){
+  const v = visible();
+  $('#list').innerHTML = v.map(p=>{
+    const a=p.chars[0]||{}, b=p.chars[1]||{};
+    return `
+    <button class="lrow ${p.id===S.current?'on':''}" data-id="${esc(p.id)}"
+            style="--c1:${esc(a.color||'#ccc')};--c2:${esc(b.color||'#ccc')}">
+      <div class="th">${p.thumb?`<img src="${esc(p.thumb)}" alt="">`:''}</div>
+      <div class="tx">
+        <div class="nm">${esc(p.name)}</div>
+        <div class="hk">${esc(p.hook)}</div>
+        <div class="mt">${esc(a.name)} × ${esc(b.name)} · ${esc(p.genre)}</div>
+      </div>
+      <span class="ar">›</span>
+    </button>`;
+  }).join('') || `<p style="color:var(--ink-3);font-size:12.5px;padding:10px 0">${esc(T('emptyText','여기엔 아직 페어가 없어요.'))}</p>`;
 }
 
 function renderDeck(){
@@ -476,7 +644,39 @@ function renderForm(){
         ${tf('섹션 — 서로의 시선','site.secPov',T('secPov','서로를 이렇게 봅니다'))}
         ${tf('섹션 — 대사','site.secTalk',T('secTalk','주고받는 말'))}
       </div>
+      <div class="f2">
+        ${tf('보기 — 카드','site.viewDeck',T('viewDeck','카드'))}
+        ${tf('보기 — 목록','site.viewList',T('viewList','목록'))}
+      </div>
       ${tf('페어가 없을 때 문구','site.emptyText',T('emptyText','여기엔 아직 페어가 없어요.'))}
+    </div>
+
+    <div class="fg">
+      <h3><span>첫 화면</span></h3>
+      <label class="fchk" style="margin-bottom:14px">
+        <input type="checkbox" data-p="site.showCover"${T('showCover',true)!==false?' checked':''}> 첫 화면 보여주기
+      </label>
+      ${ta('인사말 (줄바꿈 가능)','site.coverTitle',T('coverTitle',''))}
+      ${ta('설명 (줄바꿈 가능)','site.coverDesc',T('coverDesc',''))}
+      ${tf('큰 버튼','site.coverAll',T('coverAll','전체 보기'))}
+      <div class="f2">
+        ${tf('작은 버튼 — 자캐','site.coverOc',T('coverOc','자캐 페어만'))}
+        ${tf('작은 버튼 — 드림','site.coverDream',T('coverDream','드림만'))}
+      </div>
+      ${ta('맨 아래 한마디 (비워두면 안 보임)','site.coverFoot',T('coverFoot',''))}
+    </div>
+
+    <div class="fg">
+      <h3><span>페어 순서</span></h3>
+      <p style="font-size:10.5px;color:var(--ink-3);margin:-6px 0 12px;line-height:1.7">
+        위에 있을수록 먼저 보여요. 화살표로 옮기면 됩니다.</p>
+      ${S.data.pairs.map((q,k)=>`
+        <div class="ord">
+          <span class="ix">${k+1}</span>
+          <span class="n">${esc(q.name)}</span>
+          <button data-mv="up:${k}"${k===0?' disabled':''}>▲</button>
+          <button data-mv="down:${k}"${k===S.data.pairs.length-1?' disabled':''}>▼</button>
+        </div>`).join('')}
     </div>`;
 
   if(p){
@@ -582,7 +782,7 @@ function updateStatus(){
   $('#saveBtn').disabled = S.busy;
 }
 
-function renderAll(){ renderSite(); renderDeck(); renderDetail(); renderForm(); }
+function renderAll(){ renderSite(); renderDeck(); renderList(); renderDetail(); renderForm(); applyView(); }
 
 /* ═══════════════ 이벤트 ═══════════════ */
 document.addEventListener('input', e=>{
@@ -613,10 +813,49 @@ document.addEventListener('change', e=>{
 });
 
 document.addEventListener('click', async e=>{
+  // 첫 화면 → 들어가기
+  const ent = e.target.closest('[data-enter]');
+  if(ent){
+    const f = ent.dataset.enter;
+    S.filter = f;
+    $$('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.f===f));
+    const v = visible(); S.current = v.length ? v[0].id : null;
+    renderDeck(); renderList(); renderDetail();
+    hideCover();
+    return;
+  }
+  // 보기 전환
+  const vb = e.target.closest('[data-v]');
+  if(vb){
+    S.view = vb.dataset.v;
+    localStorage.setItem('pair-view', S.view);
+    applyView();
+    return;
+  }
+  // 목록 행
+  const lr = e.target.closest('.lrow');
+  if(lr){
+    S.current = lr.dataset.id;
+    renderList(); renderDetail();
+    $('#detail').scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  // 순서 바꾸기
+  const mv = e.target.closest('[data-mv]');
+  if(mv){
+    const [dir, idx] = mv.dataset.mv.split(':');
+    const i = Number(idx), j = dir==='up' ? i-1 : i+1;
+    if(j<0 || j>=S.data.pairs.length) return;
+    const arr = S.data.pairs;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    S.dirty = true;
+    renderAll(); updateStatus();
+    return;
+  }
   // 포스터 선택
   const po = e.target.closest('.poster');
   if(po){
-    S.current = po.dataset.id; renderDeck(); renderDetail(); renderForm();
+    S.current = po.dataset.id; renderDeck(); renderList(); renderDetail(); renderForm();
     (S.editing ? $('#form') : $('#detail')).scrollIntoView({behavior:'smooth',block:'start'});
     return;
   }
@@ -626,7 +865,7 @@ document.addEventListener('click', async e=>{
     S.filter = t.dataset.f;
     $$('#tabs button').forEach(b=>b.classList.toggle('on', b===t));
     const v = visible(); S.current = v.length ? v[0].id : null;
-    renderDeck(); renderDetail(); renderForm();
+    renderDeck(); renderList(); renderDetail(); renderForm();
     return;
   }
   // 편집 토글
@@ -689,6 +928,8 @@ async function startEdit(){
     S.editing = true; S.dirty = false;
     $('#editBtn').textContent = '보기'; $('#editBtn').classList.add('on');
     $('#savebar').hidden = false;
+    $('#cover').hidden = true;          // 편집 중엔 첫 화면 숨김
+    S.view = 'deck';                    // 어느 페어를 고치는지 보이도록
     const v = visible(); if(!cur()) S.current = v.length?v[0].id:null;
     renderAll(); updateStatus();
     toast('편집 모드예요');
@@ -749,23 +990,31 @@ function cropImage(file, aspect, round){
   return new Promise(resolve=>{
     const url = URL.createObjectURL(file);
     const img = $('#cimg');
+    const stage = $('#cstage');
     C.isPng = /png/i.test(file.type);
-    img.onload = ()=>{
-      C.nw = img.naturalWidth; C.nh = img.naturalHeight;
-      const stage = $('#cstage');
-      stage.classList.toggle('round', !!round);
-      C.fw = stage.clientWidth || 330;
-      C.fh = Math.round(C.fw / aspect);
-      stage.style.height = C.fh+'px';
-      C.base = Math.max(C.fw/C.nw, C.fh/C.nh);
-      C.zoom = 1; C.tx = 0; C.ty = 0;
-      $('#czoom').value = 100;
-      drawCrop();
-    };
-    img.src = url;
+
+    // 틀 모양·크기는 이미지 로드와 상관없이 먼저 잡아둠
     $('#c-title').textContent = round ? '두상 자르기 (1:1)' : '페어 이미지 자르기 (4:3)';
     $('#cropper').hidden = false;
     C.open = true;
+    stage.classList.toggle('round', !!round);
+    C.fw = stage.clientWidth || 330;
+    C.fh = Math.round(C.fw / aspect);
+    stage.style.height = C.fh+'px';
+    C.zoom = 1; C.tx = 0; C.ty = 0;
+    $('#czoom').value = 100;
+
+    img.onload = ()=>{
+      C.nw = img.naturalWidth; C.nh = img.naturalHeight;
+      if(!C.nw || !C.nh){ toast('이미지를 열 수 없어요'); C.resolve && C.resolve(null); return; }
+      C.fw = stage.clientWidth || C.fw;
+      C.fh = Math.round(C.fw / aspect);
+      stage.style.height = C.fh+'px';
+      C.base = Math.max(C.fw/C.nw, C.fh/C.nh);
+      drawCrop();
+    };
+    img.onerror = ()=>{ toast('이미지를 열 수 없어요'); C.resolve && C.resolve(null); };
+    img.src = url;
     C.resolve = (blob)=>{
       C.open = false; $('#cropper').hidden = true;
       URL.revokeObjectURL(url);
@@ -913,6 +1162,7 @@ window.addEventListener('beforeunload', e=>{
   }
   S.current = S.data.pairs[0]?.id || null;
   renderAll();
+  showCover();
 })();
 
 /* 스와이프 → 도트 */
