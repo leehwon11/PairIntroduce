@@ -16,7 +16,16 @@
     "secTalk": "대사",
     "labelOc": "OC PAIR",
     "labelDream": "DREAM",
-    "emptyText": "여기엔 아직 페어가 없어요."
+    "emptyText": "여기엔 아직 페어가 없어요.",
+    "showCover": true,
+    "coverTitle": "어서 오세요",
+    "coverDesc": "남파의 헤테로 페어들을 모아둔 곳입니다.\n보고 싶은 쪽을 골라주세요.",
+    "coverAll": "전체 보기",
+    "coverOc": "자캐 페어만",
+    "coverDream": "드림만",
+    "coverFoot": "",
+    "viewDeck": "카드",
+    "viewList": "목록"
   },
   "pairs": [
     {
@@ -83,7 +92,7 @@
       ]
     },
     {
-      "id": "novatic",
+      "id": "nitiyan",
       "name": "닛양",
       "nameEn": "",
       "type": "ocpair",
@@ -119,92 +128,29 @@
           "mine": false
         }
       ],
-      "relation": "좌초된 우주선에서 살아남은 항해사와 정비공. 서로를 살리기 위해 시작된 관계가 어느새 서로 없이는 항로를 못 찾는 사이가 되었습니다.",
+      "relation": "",
       "pov": [
         {
-          "who": "유디트가 보는 레이",
-          "text": "고장 나도 절대 버리지 않는, 이상하게 든든한 사람."
+          "who": "토리모토 니시키 → 아사미 야에카",
+          "text": ""
         },
         {
-          "who": "레이가 보는 유디트",
-          "text": "방향을 잃어도 불안하지 않게 만드는 사람."
+          "who": "아사미 야에카 → 토리모토 니시키",
+          "text": ""
         }
       ],
       "bgm": {
-        "title": "곡 제목",
-        "artist": "아티스트"
+        "title": "",
+        "artist": ""
       },
       "dialogue": [
         {
-          "who": "유디트",
-          "text": "나침반이 고장 났으면 그냥 버려. 내가 있잖아."
+          "who": "토리모토 니시키",
+          "text": ""
         },
         {
-          "who": "레이",
-          "text": "고장 난 채로 둘게. 그래야 네가 안 버릴 테니까."
-        }
-      ]
-    },
-    {
-      "id": "spotlight",
-      "name": "스포트라이트",
-      "nameEn": "SPOTLIGHT",
-      "type": "dream",
-      "cross": true,
-      "genre": "아이돌 · 연예계",
-      "anniversary": "2024-10-17",
-      "affinity": 81,
-      "hook": "카메라가 꺼져야 진짜가 되는 두 사람.",
-      "thumb": "",
-      "thumbCredit": "",
-      "tags": [
-        "#라이벌그룹",
-        "#무대뒤로맨스",
-        "#팬들은몰라"
-      ],
-      "chars": [
-        {
-          "name": "리아",
-          "age": "22세",
-          "alias": "무대 위의 태양",
-          "color": "#C94E78",
-          "note": "카메라 꺼지면 제일 먼저 주저앉음.",
-          "avatar": "",
-          "mine": true
-        },
-        {
-          "name": "준",
-          "age": "23세",
-          "alias": "백스테이지의 그림자",
-          "color": "#2E9686",
-          "note": "남 챙기느라 본인 건 늘 뒷전.",
-          "avatar": "",
-          "mine": false
-        }
-      ],
-      "relation": "같은 시상식 대기실에서 마주치던 라이벌 그룹 멤버들. 카메라 앞에선 데면데면, 꺼진 순간부터는 서로만 챙기는 사이입니다.",
-      "pov": [
-        {
-          "who": "리아가 보는 준",
-          "text": "넘어질 뻔한 순간까지 알아채는 사람."
-        },
-        {
-          "who": "준이 보는 리아",
-          "text": "무대 위에서도 나만 보게 되는 사람."
-        }
-      ],
-      "bgm": {
-        "title": "곡 제목",
-        "artist": "아티스트"
-      },
-      "dialogue": [
-        {
-          "who": "준",
-          "text": "오늘 무대, 나 안 보고 있었지?"
-        },
-        {
-          "who": "리아",
-          "text": "제일 잘 보고 있었어. 그러니까 넘어질 뻔한 것도 알지."
+          "who": "아사미 야에카",
+          "text": ""
         }
       ]
     }
