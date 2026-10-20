@@ -504,19 +504,21 @@ function hideCover(){
 /* ───── 보기 전환 ───── */
 function applyView(){
   const list = S.view==='list';
-  const open = list && S.detailOpen;      // 목록에서 하나를 골라 상세를 보는 중
+  // 편집 중엔 어느 페어를 고치는지 보여야 하므로 늘 카드가 보임
+  const open = S.detailOpen && !S.editing;
 
-  // 카드 보기 : 카드 + 상세 / 목록 보기 : 목록만, 고르면 상세만
-  $('#deck').hidden   = list;
-  $('#dots').hidden   = list;
+  // 고르기 전 : 카드만 또는 목록만 / 고른 뒤 : 상세만
+  $('#deck').hidden   = list || open;
+  $('#dots').hidden   = list || open;
   $('#list').hidden   = !list || open;
-  $('#detail').hidden = list && !open;
+  $('#detail').hidden = !open;
   $('#backbar').hidden = !open;
-  $('.viewbar').hidden = open;            // 상세를 보는 중엔 전환 버튼 숨김
+  $('#tabs').hidden    = open;            // 상세 중엔 필터도 숨김
+  $('.viewbar').hidden = open;
 
+  $('#backBtn').textContent = list ? '‹ 목록으로' : '‹ 카드로';
   $('#v-deck').classList.toggle('on', !list);
   $('#v-list').classList.toggle('on', list);
-  // 편집 중에는 카드로 고정 (어느 페어를 고치는지 보여야 함)
   $('.viewbar').style.display = S.editing ? 'none' : '';
 }
 
@@ -855,11 +857,16 @@ document.addEventListener('click', async e=>{
     applyView();
     return;
   }
-  // 목록에서 뒤로
+  // 상세에서 뒤로
   if(e.target.id==='backBtn'){
     S.detailOpen = false;
     applyView();
     window.scrollTo({top:0,behavior:'smooth'});
+    // 카드 보기면 보던 페어 자리로 맞춰줌
+    if(S.view==='deck'){
+      const p = document.querySelector(`.poster[data-id="${CSS.escape(S.current||'')}"]`);
+      if(p) p.scrollIntoView({behavior:'auto',inline:'center',block:'nearest'});
+    }
     return;
   }
   // 목록 행 → 상세로
@@ -883,11 +890,19 @@ document.addEventListener('click', async e=>{
     renderAll(); updateStatus();
     return;
   }
-  // 포스터 선택
+  // 카드 선택
   const po = e.target.closest('.poster');
   if(po){
-    S.current = po.dataset.id; renderDeck(); renderList(); renderDetail(); renderForm();
-    (S.editing ? $('#form') : $('#detail')).scrollIntoView({behavior:'smooth',block:'start'});
+    S.current = po.dataset.id;
+    if(S.editing){
+      // 편집 중엔 카드를 고르면 그 페어의 수정 칸으로
+      renderDeck(); renderList(); renderForm();
+      $('#form').scrollIntoView({behavior:'smooth',block:'start'});
+    }else{
+      S.detailOpen = true;
+      renderDeck(); renderList(); renderDetail(); applyView();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
     return;
   }
   // 필터
@@ -962,6 +977,7 @@ async function startEdit(){
     $('#savebar').hidden = false;
     $('#cover').hidden = true;          // 편집 중엔 첫 화면 숨김
     S.view = 'deck';                    // 어느 페어를 고치는지 보이도록
+    S.detailOpen = false;
     const v = visible(); if(!cur()) S.current = v.length?v[0].id:null;
     renderAll(); updateStatus();
     toast('편집 모드예요');
@@ -970,6 +986,7 @@ async function startEdit(){
 
 function exitEdit(){
   S.editing = false;
+  S.detailOpen = false;
   $('#editBtn').textContent = '편집'; $('#editBtn').classList.remove('on');
   $('#savebar').hidden = true;
   renderAll();
