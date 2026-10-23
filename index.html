@@ -28,10 +28,12 @@ body{
 .top .eb{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--blue)}
 .top h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:25px;line-height:1.45;margin:12px 0 8px;white-space:pre-line}
 .top p{font-size:12.5px;line-height:1.85;color:var(--ink-2);margin:0}
+.top-btns{position:absolute;top:34px;right:20px;display:flex;gap:6px}
 .edit-btn{
-  position:absolute;top:34px;right:20px;background:var(--card);border:1px solid var(--line);
+  background:var(--card);border:1px solid var(--line);
   border-radius:20px;padding:6px 13px;font-family:inherit;font-size:11px;color:var(--ink-3);cursor:pointer;
 }
+.edit-btn[hidden]{display:none}
 .edit-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
 
 .tabs{display:flex;gap:6px;padding:0 22px 16px}
@@ -328,7 +330,10 @@ body{
     <div class="eb" id="s-eb"></div>
     <h1 id="s-title"></h1>
     <p id="s-desc"></p>
-    <button class="edit-btn" id="editBtn">편집</button>
+    <div class="top-btns">
+      <button class="edit-btn" id="siteBtn" hidden>⚙ 사이트 설정</button>
+      <button class="edit-btn" id="editBtn">편집</button>
+    </div>
   </div>
 
   <div class="tabs" id="tabs">
@@ -402,18 +407,18 @@ body{
 <script>
 /* ═══════════════ 상태 ═══════════════ */
 const S = {
-  data:null, orig:null, sha:null,
+  data:null, orig:null, head:null, saved:{},
   gh:{owner:'',repo:'',branch:'main',token:''},
   editing:false, dirty:false, filter:'all', current:null, busy:false,
   view: (localStorage.getItem('pair-view')==='list' ? 'list' : 'deck'),
-  detailOpen:false
+  detailOpen:false,
+  panel:'pairs'          // 편집 화면 : 'pairs' 페어 편집 / 'site' 사이트 설정
 };
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
 /* ═══════════════ 유틸 ═══════════════ */
 const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const b64enc = str => { const b=new TextEncoder().encode(str); let s=''; b.forEach(c=>s+=String.fromCharCode(c)); return btoa(s); };
 const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,'')), c=>c.charCodeAt(0)));
 const dday = iso => {
   if(!iso) return '';
@@ -440,8 +445,15 @@ function loadGh(){
 const api = p => `https://api.github.com/repos/${S.gh.owner}/${S.gh.repo}${p}`;
 const hdr = () => ({Authorization:`Bearer ${S.gh.token}`, Accept:'application/vnd.github+json'});
 
-async function ghGetFile(path){
-  const r = await fetch(api(`/contents/${path}?ref=${S.gh.branch}`), {headers:hdr()});
+async function gh(path, method='GET', body){
+  const opt = {method, headers:hdr()};
+  if(body){ opt.headers = {...opt.headers,'Content-Type':'application/json'}; opt.body = JSON.stringify(body); }
+  const r = await fetch(api(path), opt);
+  if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||'GitHub 오류 ('+r.status+')'); }
+  return r.json();
+}
+async function ghGetFile(path, ref=S.gh.branch){
+  const r = await fetch(api(`/contents/${path}?ref=${ref}`), {headers:hdr()});
   if(r.status===404) return null;
   if(!r.ok) throw new Error('불러오기 실패 ('+r.status+')');
   return r.json();
@@ -451,7 +463,45 @@ async function ghPut(path, contentB64, sha, msg){
   if(sha) body.sha = sha;
   const r = await fetch(api(`/contents/${path}`), {method:'PUT', headers:{...hdr(),'Content-Type':'application/json'}, body:JSON.stringify(body)});
   if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||'저장 실패 ('+r.status+')'); }
-  return r.json();
+  const res = await r.json();
+  if(res.commit?.sha) S.head = res.commit.sha;   // 이미지 커밋 뒤에도 저장이 이어지도록
+  return res;
+}
+/* 여러 파일을 커밋 하나로 — content 가 null 이면 삭제 */
+async function ghCommit(changes, msg){
+  const c = await gh(`/git/commits/${S.head}`);
+  const tree = Object.entries(changes).map(([path, content]) =>
+    content===null ? {path, mode:'100644', type:'blob', sha:null}
+                   : {path, mode:'100644', type:'blob', content});
+  const t = await gh('/git/trees', 'POST', {base_tree:c.tree.sha, tree});
+  const n = await gh('/git/commits', 'POST', {message:msg, tree:t.sha, parents:[S.head]});
+  await gh(`/git/refs/heads/${S.gh.branch}`, 'PATCH', {sha:n.sha, force:false});
+  S.head = n.sha;
+}
+
+/* ═══════════════ 파일 나누기 ═══════════════
+   data.json      : 사이트 문구 + 페어 순서 (파일 이름 목록)
+   json/<영문명>.json : 페어 하나                                */
+const pairPath = name => `json/${name}.json`;
+const slugOf = s => String(s??'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const fileName = p => slugOf(p.nameEn) || slugOf(p.id) || 'pair';
+
+/* get(path) → JSON. 예전 data.json(페어가 통째로 들어있던 형식)도 읽음 */
+async function loadAll(get){
+  const idx = await get('data.json');
+  const list = idx.pairs || [];
+  const pairs = await Promise.all(list.map(x => typeof x==='string' ? get(pairPath(x)) : x));
+  pairs.forEach((p,k)=>{ if(!p.id) p.id = typeof list[k]==='string' ? list[k] : 'pair-'+k; });
+  return {data:{...idx, pairs}, legacy:list.some(x=>typeof x!=='string')};
+}
+
+/* 지금 데이터를 저장할 파일들로 */
+function buildFiles(){
+  const {pairs, ...rest} = S.data;
+  const names = pairs.map(fileName);
+  const files = {'data.json': JSON.stringify({...rest, pairs:names}, null, 2)};
+  pairs.forEach((p,k)=>{ files[pairPath(names[k])] = JSON.stringify(p, null, 2); });
+  return {files, names};
 }
 
 /* ═══════════════ 렌더 : 보기 ═══════════════ */
@@ -508,20 +558,24 @@ function applyView(){
   const list = S.view==='list';
   // 편집 중엔 어느 페어를 고치는지 보여야 하므로 늘 카드가 보임
   const open = S.detailOpen && !S.editing;
+  const site = S.editing && S.panel==='site';   // 사이트 설정 중엔 카드 숨김
 
   // 고르기 전 : 카드만 또는 목록만 / 고른 뒤 : 상세만
-  $('#deck').hidden   = list || open;
-  $('#dots').hidden   = list || open;
-  $('#list').hidden   = !list || open;
+  $('#deck').hidden   = list || open || site;
+  $('#dots').hidden   = list || open || site;
+  $('#list').hidden   = !list || open || site;
   $('#detail').hidden = !open;
   $('#backbar').hidden = !open;
-  $('#tabs').hidden    = open;            // 상세 중엔 필터도 숨김
+  $('#tabs').hidden    = open || site;    // 상세 중엔 필터도 숨김
   $('.viewbar').hidden = open;
 
   $('#backBtn').textContent = list ? '‹ 목록으로' : '‹ 카드로';
   $('#v-deck').classList.toggle('on', !list);
   $('#v-list').classList.toggle('on', list);
   $('.viewbar').style.display = S.editing ? 'none' : '';
+  $('#siteBtn').hidden = !S.editing;
+  $('#siteBtn').textContent = site ? '‹ 페어 편집' : '⚙ 사이트 설정';
+  $('#siteBtn').classList.toggle('on', site);
 }
 
 function renderList(){
@@ -629,12 +683,8 @@ function imgf(label, path, val, hint){
     </div></div>`;
 }
 
-function renderForm(){
-  if(!S.editing){ $('#form').innerHTML=''; return; }
-  const p = cur();
-  const i = S.data.pairs.findIndex(x=>x.id===S.current);
-
-  let html = `<div class="form">
+function siteForm(){
+  return `<div class="form">
     <div class="fg">
       <h3><span>사이트 소개글</span></h3>
       ${tf('작은 제목','site.eyebrow',T('eyebrow',''))}
@@ -690,7 +740,17 @@ function renderForm(){
       </div>
       ${ta('맨 아래 한마디 (비워두면 안 보임)','site.coverFoot',T('coverFoot',''))}
     </div>
+  </div>`;
+}
 
+function renderForm(){
+  if(!S.editing){ $('#form').innerHTML=''; return; }
+  const p = cur();
+  const i = S.data.pairs.findIndex(x=>x.id===S.current);
+
+  if(S.panel==='site'){ $('#form').innerHTML = siteForm(); return; }
+
+  let html = `<div class="form">
     <div class="fg">
       <h3><span>페어 순서</span></h3>
       <p style="font-size:10.5px;color:var(--ink-3);margin:-6px 0 12px;line-height:1.7">
@@ -711,6 +771,7 @@ function renderForm(){
       <h3><span>기본 정보</span><button class="btn r" data-del="${i}">이 페어 삭제</button></h3>
       ${tf('페어명','pairs.'+i+'.name',p.name)}
       ${tf('영문명','pairs.'+i+'.nameEn',p.nameEn)}
+      <p style="font-size:9.5px;color:var(--ink-3);margin:-6px 0 12px">저장 파일 : <span id="fname">${esc(pairPath(fileName(p)))}</span></p>
       ${tf('장르 / 배경','pairs.'+i+'.genre',p.genre)}
       ${ta('한 줄 소개 (제일 중요!)','pairs.'+i+'.hook',p.hook)}
       <div class="f2">
@@ -820,6 +881,7 @@ document.addEventListener('input', e=>{
   else v = el.value;
   if(path.endsWith('.tags')) v = String(v).split(',').map(s=>s.trim()).filter(Boolean);
   setPath(path, v);
+  if(path.endsWith('.nameEn') && $('#fname')) $('#fname').textContent = pairPath(fileName(cur()));
 
   // 색상/이름 등은 카드 미리보기에 바로 반영
   if(/\.(color|name|alias|hook|genre|type|cross|nameEn|tags)$/.test(path)){
@@ -917,6 +979,13 @@ document.addEventListener('click', async e=>{
     renderDeck(); renderList(); renderDetail(); renderForm(); applyView();
     return;
   }
+  // 사이트 설정 ↔ 페어 편집
+  if(e.target.id==='siteBtn'){
+    S.panel = S.panel==='site' ? 'pairs' : 'site';
+    renderDeck(); renderForm(); applyView();
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
   // 편집 토글
   if(e.target.id==='editBtn'){
     if(S.editing){ exitEdit(); } else { openModal(); }
@@ -967,11 +1036,19 @@ async function startEdit(){
   };
   if(!S.gh.owner||!S.gh.repo||!S.gh.token){ toast('아이디·레포·토큰을 모두 입력해주세요'); return; }
   try{
-    const f = await ghGetFile('data.json');
-    if(!f) throw new Error('레포에 data.json 이 없어요');
-    S.sha = f.sha;
-    S.data = JSON.parse(b64dec(f.content));
+    S.head = (await gh(`/git/ref/heads/${S.gh.branch}`)).object.sha;
+    const raw = {};
+    const {data, legacy} = await loadAll(async path=>{
+      const f = await ghGetFile(path, S.head);
+      if(!f) throw new Error(`레포에 ${path} 이 없어요`);
+      return JSON.parse(raw[path] = b64dec(f.content));
+    });
+    S.data = data;
     S.orig = JSON.parse(JSON.stringify(S.data));
+    S.saved = buildFiles().files;
+    // 레포에 실제로 있는 페어 파일만 기억 (이름이 바뀌면 지우려고)
+    Object.keys(S.saved).forEach(k=>{ if(!(k in raw)) delete S.saved[k]; });
+    if(legacy) S.saved['data.json'] = null;   // 예전 형식 → 처음 저장할 때 나눠서 씀
     localStorage.setItem('pair-gh', JSON.stringify(S.gh));
     $('#modal').hidden = true;
     S.editing = true; S.dirty = false;
@@ -980,6 +1057,7 @@ async function startEdit(){
     $('#cover').hidden = true;          // 편집 중엔 첫 화면 숨김
     S.view = 'deck';                    // 어느 페어를 고치는지 보이도록
     S.detailOpen = false;
+    S.panel = 'pairs';
     const v = visible(); if(!cur()) S.current = v.length?v[0].id:null;
     renderAll(); updateStatus();
     toast('편집 모드예요');
@@ -988,6 +1066,7 @@ async function startEdit(){
 
 function exitEdit(){
   S.editing = false;
+  S.panel = 'pairs';
   S.detailOpen = false;
   $('#editBtn').textContent = '편집'; $('#editBtn').classList.remove('on');
   $('#savebar').hidden = true;
@@ -998,7 +1077,7 @@ function exitEdit(){
 function addPair(){
   const id = 'pair-' + Date.now().toString(36);
   S.data.pairs.push({
-    id, name:'새 페어', nameEn:'NEW PAIR', type:'ocpair', cross:false,
+    id, name:'새 페어', nameEn:'', type:'ocpair', cross:false,
     genre:'장르', anniversary:new Date().toISOString().slice(0,10), affinity:80,
     hook:'한 줄 소개를 적어주세요.', thumb:'', thumbCredit:'',
     tags:['#태그'],
@@ -1176,16 +1255,25 @@ function pickImage(path){
 /* ═══════════════ 저장 ═══════════════ */
 async function save(){
   if(S.busy) return;
+  const {files, names} = buildFiles();
+  const dup = names.find((n,k)=>names.indexOf(n)!==k);
+  if(dup){ toast(`영문명이 겹쳐요 (${pairPath(dup)}) — 하나를 바꿔주세요`); return; }
+
+  // 바뀐 파일만, 이름이 바뀌거나 지운 페어는 예전 파일 삭제
+  const changes = {};
+  for(const [k,v] of Object.entries(files)) if(S.saved[k]!==v) changes[k] = v;
+  for(const k of Object.keys(S.saved)) if(!(k in files)) changes[k] = null;
+  if(!Object.keys(changes).length){ S.dirty=false; updateStatus(); toast('바뀐 내용이 없어요'); return; }
+
   S.busy = true; updateStatus(); toast('저장 중…');
   try{
-    const json = JSON.stringify(S.data, null, 2);
-    const res = await ghPut('data.json', b64enc(json), S.sha, 'update pairs');
-    S.sha = res.content.sha;
+    await ghCommit(changes, 'update pairs');
+    S.saved = files;
     S.orig = JSON.parse(JSON.stringify(S.data));
     S.dirty = false;
     toast('저장했어요! 1~2분 뒤 사이트에 반영돼요');
   }catch(err){
-    if(String(err.message).includes('does not match')){
+    if(/does not match|fast forward/i.test(String(err.message))){
       toast('다른 곳에서 먼저 수정됐어요. 새로고침 후 다시 해주세요');
     } else toast(err.message);
   }
@@ -1200,13 +1288,16 @@ window.addEventListener('beforeunload', e=>{
 (async function init(){
   loadGh();
   try{
-    const r = await fetch('data.json?t='+Date.now());
-    S.data = await r.json();
+    S.data = (await loadAll(async path=>{
+      const r = await fetch(path+'?t='+Date.now());
+      if(!r.ok) throw new Error(path);
+      return r.json();
+    })).data;
   }catch(e){
     $('#form').innerHTML = `<div class="form"><div class="fg">
       <h3>data.json 을 못 불러왔어요</h3>
       <p style="font-size:12px;line-height:1.8;color:var(--ink-2);margin:0">
-      index.html 과 같은 위치에 data.json 이 있어야 해요.<br>
+      index.html 과 같은 위치에 data.json 과 json 폴더가 있어야 해요.<br>
       (내 컴퓨터에서 그냥 열면 보안 때문에 안 보일 수 있어요 — GitHub에 올린 뒤 확인해주세요)</p>
     </div></div>`;
     return;

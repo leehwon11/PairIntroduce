@@ -1,0 +1,63 @@
+{
+  "id": "nitiyan",
+  "name": "닛양",
+  "nameEn": "",
+  "type": "ocpair",
+  "cross": true,
+  "genre": "현대 일본",
+  "anniversary": "2026-09-06",
+  "affinity": 76,
+  "hook": "유이무이한 초능력자들!",
+  "thumb": "images/mvf36he0.jpg",
+  "thumbCredit": "",
+  "tags": [
+    "#동료",
+    "#그래도 나니까 봐줄게",
+    "#짜증나 네가 뭔데~!"
+  ],
+  "chars": [
+    {
+      "name": "토리모토 니시키",
+      "age": "19세",
+      "alias": "타고난 독설가",
+      "color": "#486a61",
+      "note": "음파",
+      "avatar": "images/mvf37o6i.png",
+      "mine": true
+    },
+    {
+      "name": "아사미 야에카",
+      "age": "18세",
+      "alias": "착한 아이",
+      "color": "#ffb0bd",
+      "note": "염동력.",
+      "avatar": "images/mvf37rky.png",
+      "mine": false
+    }
+  ],
+  "relation": "",
+  "pov": [
+    {
+      "who": "토리모토 니시키 → 아사미 야에카",
+      "text": ""
+    },
+    {
+      "who": "아사미 야에카 → 토리모토 니시키",
+      "text": ""
+    }
+  ],
+  "bgm": {
+    "title": "",
+    "artist": ""
+  },
+  "dialogue": [
+    {
+      "who": "토리모토 니시키",
+      "text": ""
+    },
+    {
+      "who": "아사미 야에카",
+      "text": ""
+    }
+  ]
+}

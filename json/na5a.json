@@ -1,0 +1,63 @@
+{
+  "id": "pair-mvgo8lc0",
+  "name": "나사",
+  "nameEn": "NA5A",
+  "type": "dream",
+  "cross": false,
+  "genre": "리버스: 1999",
+  "anniversary": "2025-06-03",
+  "affinity": 97,
+  "hook": "무한한 우주의 영원한 동반자",
+  "thumb": "images/mvgobfje.jpg",
+  "thumbCredit": "",
+  "tags": [
+    "#동반자",
+    "#너와 항해하고 싶어",
+    "#베스트 프랜드는 너야"
+  ],
+  "chars": [
+    {
+      "name": "허블",
+      "age": "???",
+      "alias": "천체를 방관하는 망원경",
+      "color": "#F0F8AF",
+      "note": "설정 메모",
+      "avatar": "images/mvgoc26l.jpg",
+      "mine": false
+    },
+    {
+      "name": "보이저",
+      "age": "???",
+      "alias": "우주로부터 멀어지는 탐사선",
+      "color": "#031287",
+      "note": "설정 메모",
+      "avatar": "images/mvgoc9ym.jpg",
+      "mine": false
+    }
+  ],
+  "relation": "두 사람이 어떤 사이인지 적어주세요.",
+  "pov": [
+    {
+      "who": "A가 보는 B",
+      "text": ""
+    },
+    {
+      "who": "B가 보는 A",
+      "text": ""
+    }
+  ],
+  "bgm": {
+    "title": "",
+    "artist": ""
+  },
+  "dialogue": [
+    {
+      "who": "캐릭터 A",
+      "text": ""
+    },
+    {
+      "who": "캐릭터 B",
+      "text": ""
+    }
+  ]
+}
