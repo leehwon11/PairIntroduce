@@ -84,10 +84,20 @@ body{
 
 /* 상세 */
 .detail{padding:0 22px}
-.d-head{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:20px}
-.d-head .bar{width:3px;height:32px;border-radius:3px;background:linear-gradient(var(--c1),var(--c2))}
-.d-head h2{font-family:'Noto Serif KR',serif;font-weight:700;font-size:20px;margin:0}
-.d-head .en{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--ink-3);margin-top:3px}
+.d-hero{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/3;margin-bottom:22px;
+  background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 6px 22px rgba(20,30,50,.16)}
+.d-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.d-hero .tint{position:absolute;inset:0;background:linear-gradient(135deg,var(--c1),var(--c2));opacity:.3;mix-blend-mode:multiply}
+.d-hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 38%,rgba(10,12,20,.82))}
+.d-hero .line{position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--c1),var(--c2))}
+.d-hero .tx{position:absolute;left:18px;right:18px;bottom:18px;color:#fff}
+.d-hero .gn{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;
+  background:rgba(255,255,255,.18);backdrop-filter:blur(4px);padding:3px 8px;border-radius:10px;margin-bottom:9px}
+.d-hero h2{font-family:'Noto Serif KR',serif;font-weight:700;font-size:26px;margin:0;line-height:1.3}
+.d-hero .en{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.75);margin-top:3px}
+.d-hero .pr{font-family:'Noto Serif KR',serif;font-size:13px;margin-top:10px;color:rgba(255,255,255,.92)}
+.d-hero .pr .x{opacity:.6;margin:0 6px}
+.d-hero .hk{font-size:12px;line-height:1.7;color:rgba(255,255,255,.82);margin-top:6px}
 .sec{margin-bottom:24px}
 .sec-t{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--ink-3);margin-bottom:11px}
 .para{font-size:13px;line-height:1.95;color:var(--ink-2);margin:0}
@@ -151,6 +161,11 @@ body{
 .btn:hover{background:#dfe9f8}
 .btn.g{background:#fff;color:var(--ink-3)}
 .btn.r{background:#fdeceb;color:var(--red);border-color:#f3cfcc}
+.li{background:#fafbfd;border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px}
+.lh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.lh .ix{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-3);width:16px}
+.lh select{flex:1;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:inherit;font-size:12px;color:var(--ink)}
+.lh .sp{flex:1}
 .addpair{width:100%;background:var(--card);border:1px dashed var(--line);border-radius:14px;
   padding:14px;font-family:inherit;font-size:12.5px;color:var(--ink-3);cursor:pointer;margin-bottom:12px}
 .addpair:hover{border-color:var(--blue);color:var(--blue)}
@@ -429,6 +444,9 @@ const darken = (hex, amt=.38) => {
   if(!/^[0-9a-f]{6}$/i.test(h)) return '';
   return '#' + [0,2,4].map(k=>Math.round(parseInt(h.slice(k,k+2),16)*(1-amt)).toString(16).padStart(2,'0')).join('');
 };
+/* 대사를 하는 쪽 — 0 : 캐릭터 A, 1 : 캐릭터 B (예전 데이터는 번갈아) */
+const sideOf = (d, i) => (d.side==null || d.side==='') ? i%2 : (Number(d.side)===1 ? 1 : 0);
+const getPath = path => path.split('.').reduce((o,k)=>o?.[k], S.data);
 const talkColor = c => (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(c?.talkColor||'') ? c.talkColor : darken(c?.color));
 const dday = iso => {
   if(!iso) return '';
@@ -639,13 +657,24 @@ function renderDetail(){
   const p = cur();
   if(!p){ $('#detail').innerHTML=''; return; }
   const a=p.chars[0]||{}, b=p.chars[1]||{};
+  // 비어 있는 칸은 그리지 않음
+  const pov  = (p.pov||[]).filter(v=>v.text);
+  const talk = (p.dialogue||[]).filter(d=>d.text);
+  const bgm  = [p.bgm?.title, p.bgm?.artist].filter(Boolean).join(' — ');
   $('#detail').innerHTML = `
   <div class="detail" style="--c1:${esc(a.color||'#ccc')};--c2:${esc(b.color||'#ccc')}">
-    <div class="d-head">
-      <div class="bar"></div>
-      <div><h2>${esc(p.name)}</h2><div class="en">${esc(p.nameEn)} · ${esc(p.genre)}</div></div>
+    <div class="d-hero">
+      ${p.thumb?`<img src="${esc(p.thumb)}" alt="${esc(p.name)}">`:''}
+      <div class="tint"></div><div class="shade"></div><div class="line"></div>
+      <div class="tx">
+        ${p.genre?`<span class="gn">${esc(p.genre)}</span>`:''}
+        <h2>${esc(p.name)}</h2>
+        ${p.nameEn?`<div class="en">${esc(p.nameEn)}</div>`:''}
+        <div class="pr">${esc(a.name)}<span class="x">×</span>${esc(b.name)}</div>
+        ${p.hook?`<div class="hk">${esc(p.hook)}</div>`:''}
+      </div>
     </div>
-    <div class="sec"><div class="sec-t">${esc(T('secRelation','이런 사이예요'))}</div><p class="para">${esc(p.relation)}</p></div>
+    ${p.relation?`<div class="sec"><div class="sec-t">${esc(T('secRelation','이런 사이예요'))}</div><p class="para">${esc(p.relation)}</p></div>`:''}
     <div class="sec"><div class="sec-t">${esc(T('secChars','누구인가요'))}</div>
       ${p.chars.map(c=>`
       <div class="who" style="--c:${esc(c.color||'#ccc')}">
@@ -658,19 +687,20 @@ function renderDetail(){
         </div>
       </div>`).join('')}
     </div>
-    <div class="sec"><div class="sec-t">${esc(T('secPov','서로를 이렇게 봅니다'))}</div>
-      <div class="pov">${(p.pov||[]).map(v=>`<div><b>${esc(v.who)}</b><br>${esc(v.text)}</div>`).join('')}</div>
-    </div>
-    <div class="sec"><div class="sec-t">${esc(T('secTalk','주고받는 말'))}</div>
-      <div class="talk">${(p.dialogue||[]).map((d,i)=>{
-        const tc = talkColor(p.chars[i]);
+    ${pov.length?`<div class="sec"><div class="sec-t">${esc(T('secPov','서로를 이렇게 봅니다'))}</div>
+      <div class="pov">${pov.map(v=>`<div>${v.who?`<b>${esc(v.who)}</b><br>`:''}${esc(v.text)}</div>`).join('')}</div>
+    </div>`:''}
+    ${talk.length||bgm?`<div class="sec"><div class="sec-t">${esc(T('secTalk','주고받는 말'))}</div>
+      ${talk.length?`<div class="talk">${talk.map(d=>{
+        const side = sideOf(d, p.dialogue.indexOf(d));
+        const tc = talkColor(p.chars[side]);
         return `
-        <div class="b ${i===1?'b2':''} ${tc?'tc':''}"${tc?` style="--tb:${esc(tc)}"`:''}><span class="w">${esc(d.who)}</span>${esc(d.text)}</div>`;
-      }).join('')}</div>
-      <div class="bgm">♪ &nbsp;${esc(p.bgm?.title)} — ${esc(p.bgm?.artist)}</div>
-    </div>
+        <div class="b ${side===1?'b2':''} ${tc?'tc':''}"${tc?` style="--tb:${esc(tc)}"`:''}><span class="w">${esc(d.who)}</span>${esc(d.text)}</div>`;
+      }).join('')}</div>`:''}
+      ${bgm?`<div class="bgm">♪ &nbsp;${esc(bgm)}</div>`:''}
+    </div>`:''}
     <div class="meta">
-      <span>${esc((p.anniversary||'').replace(/-/g,'.'))} · ${dday(p.anniversary)}</span>
+      <span>${p.anniversary?`${esc(p.anniversary.replace(/-/g,'.'))} · ${dday(p.anniversary)}`:''}</span>
       <div class="bar"><i style="width:${Number(p.affinity)||0}%"></i></div>
       <span>${Number(p.affinity)||0}%</span>
     </div>
@@ -808,7 +838,6 @@ function renderForm(){
     <div class="fg">
       <h3><span>대표 이미지</span></h3>
       ${imgf('페어 이미지','pairs.'+i+'.thumb',p.thumb)}
-      ${tf('이미지 출처 표기','pairs.'+i+'.thumbCredit',p.thumbCredit)}
     </div>`;
 
     p.chars.forEach((c,j)=>{
@@ -841,18 +870,37 @@ function renderForm(){
     <div class="fg">
       <h3><span>관계</span></h3>
       ${ta('관계 설명','pairs.'+i+'.relation',p.relation)}
-      ${tf('A가 보는 B — 제목','pairs.'+i+'.pov.0.who',p.pov?.[0]?.who||'')}
-      ${ta('A가 보는 B — 내용','pairs.'+i+'.pov.0.text',p.pov?.[0]?.text||'')}
-      ${tf('B가 보는 A — 제목','pairs.'+i+'.pov.1.who',p.pov?.[1]?.who||'')}
-      ${ta('B가 보는 A — 내용','pairs.'+i+'.pov.1.text',p.pov?.[1]?.text||'')}
+    </div>
+
+    <div class="fg">
+      <h3><span>감정</span></h3>
+      ${(p.pov||[]).map((v,k)=>`
+      <div class="li">
+        <div class="lh"><span class="ix">${k+1}</span><span class="sp"></span>
+          <button class="btn g" data-rm="pairs.${i}.pov.${k}">삭제</button></div>
+        ${tf('제목 (예: A → B)','pairs.'+i+'.pov.'+k+'.who',v.who||'')}
+        ${ta('내용','pairs.'+i+'.pov.'+k+'.text',v.text||'')}
+      </div>`).join('')}
+      <button class="btn" data-add="pairs.${i}.pov">＋ 감정 추가</button>
     </div>
 
     <div class="fg">
       <h3><span>주고받는 말</span></h3>
-      ${tf('첫 번째 — 말하는 사람','pairs.'+i+'.dialogue.0.who',p.dialogue?.[0]?.who||'')}
-      ${ta('첫 번째 — 대사','pairs.'+i+'.dialogue.0.text',p.dialogue?.[0]?.text||'')}
-      ${tf('두 번째 — 말하는 사람','pairs.'+i+'.dialogue.1.who',p.dialogue?.[1]?.who||'')}
-      ${ta('두 번째 — 대사','pairs.'+i+'.dialogue.1.text',p.dialogue?.[1]?.text||'')}
+      ${(p.dialogue||[]).map((d,k)=>{
+        const sd = sideOf(d,k);
+        return `
+      <div class="li">
+        <div class="lh"><span class="ix">${k+1}</span>
+          <select data-p="pairs.${i}.dialogue.${k}.side">
+            <option value="0"${sd===0?' selected':''}>왼쪽 · ${esc(a.name||'캐릭터 A')} 색</option>
+            <option value="1"${sd===1?' selected':''}>오른쪽 · ${esc(b.name||'캐릭터 B')} 색</option>
+          </select>
+          <button class="btn g" data-rm="pairs.${i}.dialogue.${k}">삭제</button></div>
+        ${tf('말하는 사람','pairs.'+i+'.dialogue.'+k+'.who',d.who||'')}
+        ${ta('대사','pairs.'+i+'.dialogue.'+k+'.text',d.text||'')}
+      </div>`;
+      }).join('')}
+      <button class="btn" data-add="pairs.${i}.dialogue">＋ 대사 추가</button>
     </div>
 
     <div class="fg">
@@ -924,7 +972,7 @@ document.addEventListener('input', e=>{
 
 document.addEventListener('change', e=>{
   const sel = e.target.closest('select[data-p]');
-  if(sel){ setPath(sel.dataset.p, sel.value); renderDeck(); }
+  if(sel){ setPath(sel.dataset.p, sel.dataset.p.endsWith('.side') ? Number(sel.value) : sel.value); renderDeck(); }
 });
 
 document.addEventListener('click', async e=>{
@@ -949,25 +997,34 @@ document.addEventListener('click', async e=>{
     applyView();
     return;
   }
-  // 상세에서 뒤로
+  // 상세에서 뒤로 — 사이트 안에서 들어왔으면 브라우저 뒤로가기와 똑같이
   if(e.target.id==='backBtn'){
-    S.detailOpen = false;
-    applyView();
-    window.scrollTo({top:0,behavior:'smooth'});
-    // 카드 보기면 보던 페어 자리로 맞춰줌
-    if(S.view==='deck'){
-      const p = document.querySelector(`.poster[data-id="${CSS.escape(S.current||'')}"]`);
-      if(p) p.scrollIntoView({behavior:'auto',inline:'center',block:'nearest'});
-    }
+    if(S.inApp) history.back();
+    else { history.replaceState(null,'',location.pathname+location.search); closeDetail(); }
     return;
   }
   // 목록 행 → 상세로
   const lr = e.target.closest('.lrow');
-  if(lr){
-    S.current = lr.dataset.id;
-    S.detailOpen = true;
-    renderList(); renderDetail(); applyView();
-    window.scrollTo({top:0,behavior:'smooth'});
+  if(lr){ openPair(lr.dataset.id); return; }
+  // 감정 / 대사 줄 추가
+  const ad = e.target.closest('[data-add]');
+  if(ad){
+    const path = ad.dataset.add, arr = getPath(path) || [], p = cur();
+    if(path.endsWith('.dialogue')){
+      const last = arr[arr.length-1];
+      const side = last ? 1 - sideOf(last, arr.length-1) : 0;
+      arr.push({who:p.chars[side]?.name||'', text:'', side});
+    } else arr.push({who:'', text:''});
+    setPath(path, arr); renderForm();
+    return;
+  }
+  // 감정 / 대사 줄 삭제
+  const rm = e.target.closest('[data-rm]');
+  if(rm){
+    const seg = rm.dataset.rm.split('.'), k = Number(seg.pop()), path = seg.join('.');
+    const arr = getPath(path) || [];
+    if(arr[k]?.text && !confirm('이 줄을 지울까요?')) return;
+    arr.splice(k,1); setPath(path, arr); renderForm();
     return;
   }
   // 순서 바꾸기
@@ -990,11 +1047,7 @@ document.addEventListener('click', async e=>{
       // 편집 중엔 카드를 고르면 그 페어의 수정 칸으로
       renderDeck(); renderList(); renderForm();
       $('#form').scrollIntoView({behavior:'smooth',block:'start'});
-    }else{
-      S.detailOpen = true;
-      renderDeck(); renderList(); renderDetail(); applyView();
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
+    }else openPair(po.dataset.id);
     return;
   }
   // 필터
@@ -1047,6 +1100,44 @@ document.addEventListener('click', async e=>{
   if(up){ pickImage(up.dataset.up); return; }
 });
 
+/* ═══════════════ 페어별 링크 (#영문명) ═══════════════ */
+const pairByHash = () => {
+  const h = decodeURIComponent(location.hash.slice(1));
+  return h ? S.data.pairs.find(p=>fileName(p)===h) : null;
+};
+function openPair(id){
+  const p = S.data.pairs.find(x=>x.id===id); if(!p) return;
+  S.inApp = true;                                   // 뒤로가기로 메인에 돌아올 수 있음
+  if(location.hash.slice(1)===fileName(p)) route();
+  else location.hash = fileName(p);                 // → hashchange → route()
+}
+function closeDetail(){
+  S.detailOpen = false;
+  applyView();
+  window.scrollTo({top:0,behavior:'auto'});
+  // 카드 보기면 보던 페어 자리로 맞춰줌
+  if(S.view==='deck'){
+    const p = document.querySelector(`.poster[data-id="${CSS.escape(S.current||'')}"]`);
+    if(p) p.scrollIntoView({behavior:'auto',inline:'center',block:'nearest'});
+  }
+}
+/* 주소의 # 에 맞춰 상세 열기/닫기 */
+function route(){
+  if(S.editing || !S.data) return;
+  const p = pairByHash();
+  if(!p){ S.inApp = false; if(S.detailOpen) closeDetail(); return; }
+  S.current = p.id;
+  if(!visible().includes(p)){
+    S.filter = 'all';
+    $$('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.f==='all'));
+  }
+  S.detailOpen = true;
+  $('#cover').hidden = true;
+  renderDeck(); renderList(); renderDetail(); applyView();
+  window.scrollTo({top:0,behavior:'auto'});
+}
+window.addEventListener('hashchange', route);
+
 /* ═══════════════ 편집 진입/종료 ═══════════════ */
 function openModal(){
   loadGh();
@@ -1086,6 +1177,7 @@ async function startEdit(){
     S.view = 'deck';                    // 어느 페어를 고치는지 보이도록
     S.detailOpen = false;
     S.panel = 'pairs';
+    if(location.hash) history.replaceState(null,'',location.pathname+location.search);
     const v = visible(); if(!cur()) S.current = v.length?v[0].id:null;
     renderAll(); updateStatus();
     toast('편집 모드예요');
@@ -1107,7 +1199,7 @@ function addPair(){
   S.data.pairs.push({
     id, name:'새 페어', nameEn:'', type:'ocpair', cross:false,
     genre:'장르', anniversary:new Date().toISOString().slice(0,10), affinity:80,
-    hook:'한 줄 소개를 적어주세요.', thumb:'', thumbCredit:'',
+    hook:'한 줄 소개를 적어주세요.', thumb:'',
     tags:['#태그'],
     chars:[
       {name:'캐릭터 A', age:'나이', alias:'이명', color:'#3C6FC4', note:'설정 메모', avatar:'', mine:false},
@@ -1291,15 +1383,23 @@ async function save(){
   const changes = {};
   for(const [k,v] of Object.entries(files)) if(S.saved[k]!==v) changes[k] = v;
   for(const k of Object.keys(S.saved)) if(!(k in files)) changes[k] = null;
-  if(!Object.keys(changes).length){ S.dirty=false; updateStatus(); toast('바뀐 내용이 없어요'); return; }
 
   S.busy = true; updateStatus(); toast('저장 중…');
   try{
+    // 어디에도 안 쓰는 이미지 정리 (사진을 바꾸면 예전 파일이 남으므로)
+    const used = new Set(JSON.stringify(S.data).match(/images\/[^"\\]+/g) || []);
+    const imgs = await gh(`/contents/images?ref=${S.head}`).catch(()=>[]);
+    let cleaned = 0;
+    for(const f of Array.isArray(imgs) ? imgs : [])
+      if(f.type==='file' && !used.has(f.path)){ changes[f.path] = null; cleaned++; }
+    if(!Object.keys(changes).length){
+      S.dirty=false; S.busy=false; updateStatus(); toast('바뀐 내용이 없어요'); return;
+    }
     await ghCommit(changes, 'update pairs');
     S.saved = files;
     S.orig = JSON.parse(JSON.stringify(S.data));
     S.dirty = false;
-    toast('저장했어요! 1~2분 뒤 사이트에 반영돼요');
+    toast(`저장했어요!${cleaned?` (안 쓰는 이미지 ${cleaned}장 정리)`:''} 1~2분 뒤 사이트에 반영돼요`);
   }catch(err){
     if(/does not match|fast forward/i.test(String(err.message))){
       toast('다른 곳에서 먼저 수정됐어요. 새로고침 후 다시 해주세요');
@@ -1332,7 +1432,8 @@ window.addEventListener('beforeunload', e=>{
   }
   S.current = S.data.pairs[0]?.id || null;
   renderAll();
-  showCover();
+  if(pairByHash()) route();      // 페어 링크로 들어오면 첫 화면 없이 바로
+  else showCover();
 })();
 
 /* 스와이프 → 도트 */
