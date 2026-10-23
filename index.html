@@ -112,6 +112,8 @@ body{
 .talk .b.b2{margin-left:auto;background:var(--blue);border-color:var(--blue);color:#fff;
   border-bottom-left-radius:14px;border-bottom-right-radius:4px}
 .talk .b.b2 .w{color:rgba(255,255,255,.72)}
+.talk .b.tc{background:var(--tb);border-color:var(--tb);color:#fff}
+.talk .b.tc .w{color:rgba(255,255,255,.72)}
 .bgm{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-2);background:var(--card);
   border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-top:12px}
 .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;
@@ -420,6 +422,14 @@ const $$ = s => [...document.querySelectorAll(s)];
 /* ═══════════════ 유틸 ═══════════════ */
 const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const b64dec = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,'')), c=>c.charCodeAt(0)));
+/* 대표색을 어둡게 — 대사 말풍선 기본색 */
+const darken = (hex, amt=.38) => {
+  let h = String(hex||'').trim().replace('#','');
+  if(/^[0-9a-f]{3}$/i.test(h)) h = h.replace(/./g, c=>c+c);
+  if(!/^[0-9a-f]{6}$/i.test(h)) return '';
+  return '#' + [0,2,4].map(k=>Math.round(parseInt(h.slice(k,k+2),16)*(1-amt)).toString(16).padStart(2,'0')).join('');
+};
+const talkColor = c => (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(c?.talkColor||'') ? c.talkColor : darken(c?.color));
 const dday = iso => {
   if(!iso) return '';
   const a=new Date(iso), t=new Date(); if(isNaN(a)) return '';
@@ -652,8 +662,11 @@ function renderDetail(){
       <div class="pov">${(p.pov||[]).map(v=>`<div><b>${esc(v.who)}</b><br>${esc(v.text)}</div>`).join('')}</div>
     </div>
     <div class="sec"><div class="sec-t">${esc(T('secTalk','주고받는 말'))}</div>
-      <div class="talk">${(p.dialogue||[]).map((d,i)=>`
-        <div class="b ${i===1?'b2':''}"><span class="w">${esc(d.who)}</span>${esc(d.text)}</div>`).join('')}</div>
+      <div class="talk">${(p.dialogue||[]).map((d,i)=>{
+        const tc = talkColor(p.chars[i]);
+        return `
+        <div class="b ${i===1?'b2':''} ${tc?'tc':''}"${tc?` style="--tb:${esc(tc)}"`:''}><span class="w">${esc(d.who)}</span>${esc(d.text)}</div>`;
+      }).join('')}</div>
       <div class="bgm">♪ &nbsp;${esc(p.bgm?.title)} — ${esc(p.bgm?.artist)}</div>
     </div>
     <div class="meta">
@@ -814,6 +827,12 @@ function renderForm(){
             <input type="color" data-p="pairs.${i}.chars.${j}.color" value="${esc(c.color||'#cccccc')}">
             <input type="text" data-p="pairs.${i}.chars.${j}.color" value="${esc(c.color)}" style="flex:1">
           </div></div>
+        <div class="f"><label>대사 배경색 (비워두면 대표색보다 어둡게 자동)</label>
+          <div class="fcol">
+            <input type="color" data-p="pairs.${i}.chars.${j}.talkColor" value="${esc(talkColor(c)||'#555555')}">
+            <input type="text" data-p="pairs.${i}.chars.${j}.talkColor" value="${esc(c.talkColor||'')}" placeholder="자동 ${esc(darken(c.color))}" style="flex:1">
+            ${c.talkColor?`<button class="btn g" data-clr="pairs.${i}.chars.${j}.talkColor">자동</button>`:''}
+          </div></div>
         <label class="fchk"><input type="checkbox" data-p="pairs.${i}.chars.${j}.mine"${c.mine?' checked':''}> 내 캐릭터</label>
       </div>`;
     });
@@ -887,9 +906,18 @@ document.addEventListener('input', e=>{
   if(/\.(color|name|alias|hook|genre|type|cross|nameEn|tags)$/.test(path)){
     renderDeck();
     if(path.endsWith('.color')){
+      // 대사 배경색이 자동이면 미리보기도 따라감
+      const t = path.replace(/color$/,'talkColor');
+      $$(`[data-p="${CSS.escape(t)}"]`).forEach(o=>{
+        if(o.type==='color' && !$(`input[type=text][data-p="${CSS.escape(t)}"]`).value) o.value = darken(el.value)||o.value;
+        if(o.type==='text') o.placeholder = '자동 '+darken(el.value);
+      });
       // 컬러 피커 ↔ 텍스트 동기화
       $$(`[data-p="${CSS.escape(path)}"]`).forEach(o=>{ if(o!==el) o.value = el.value; });
     }
+  }
+  if(path.endsWith('.talkColor')){
+    $$(`[data-p="${CSS.escape(path)}"]`).forEach(o=>{ if(o!==el && (o.type==='text' || /^#[0-9a-f]{6}$/i.test(el.value))) o.value = el.value; });
   }
   if(path.startsWith('site.')){ renderSite(); renderDeck(); renderDetail(); }
 });
