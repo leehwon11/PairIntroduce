@@ -1,7 +1,7 @@
 {
   "id": "nitiyan",
   "name": "닛양",
-  "nameEn": "",
+  "nameEn": "nityang",
   "type": "ocpair",
   "cross": true,
   "genre": "현대 일본",
@@ -21,7 +21,7 @@
       "alias": "타고난 독설가",
       "color": "#486a61",
       "note": "음파",
-      "avatar": "images/mvf37o6i.png",
+      "avatar": "images/mvrlw1et.jpg",
       "mine": true
     },
     {
@@ -29,8 +29,8 @@
       "age": "18세",
       "alias": "착한 아이",
       "color": "#ffb0bd",
-      "note": "염동력.",
-      "avatar": "images/mvf37rky.png",
+      "note": "염동력",
+      "avatar": "images/mvrlwgp1.jpg",
       "mine": false
     }
   ],
